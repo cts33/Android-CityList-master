@@ -43,7 +43,7 @@ public class LetterListView extends View {
     private int textFocusColor = Color.RED;
 
     int paddingTop, paddingDown;
-    private Drawable defaultBgDrawable;
+
     //每个字母占位的高度值 px
     private int singleHeight=24;
 
@@ -75,7 +75,6 @@ public class LetterListView extends View {
         width = DensityUtil.dp2px(context, 50);
         paddingTop = paddingDown = DensityUtil.dp2px(context, 10);
 
-        defaultBgDrawable = getResources().getDrawable(R.drawable.letter_bg_shape);
 
         letterList.addAll(Arrays.asList(defaultLets));
 
@@ -99,6 +98,7 @@ public class LetterListView extends View {
     public void setTextSize(int textSize, int textDefaultColor) {
         this.textSize = textSize;
         this.textDefaultColor = textDefaultColor;
+        invalidate();
     }
 
 
@@ -110,7 +110,6 @@ public class LetterListView extends View {
         for (int i = 0; i < letterList.size(); i++) {
             height+=singleHeight;
         }
-
         setMeasuredDimension(width, height);
     }
 
@@ -154,28 +153,16 @@ public class LetterListView extends View {
         final float y = event.getY();
         final int oldChoose = choose;
         //计算事件在哪个字母的下标index
-        final int c = (int) (y / getHeight() * letterList.size());
+        final int currenIndex = (int) (y / getHeight() * letterList.size());
         Log.d(TAG, "dispatchTouchEvent: y  = " + y + " getHeight()=" + getHeight());
-        Log.d(TAG, "dispatchTouchEvent: c  = " + c);
+        Log.d(TAG, "dispatchTouchEvent: c  = " + currenIndex);
         switch (action) {
-            case MotionEvent.ACTION_DOWN:
 
-                if (oldChoose != c && onTouchingLetterChangedListener != null) {
-                    if (c >= 0 && c < letterList.size()) {
-                        onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(c));
-                        choose = c;
-                        invalidate();
-                    }
-                }
+            case MotionEvent.ACTION_DOWN:
+                updateLetterByEvent(oldChoose,currenIndex);
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (oldChoose != c && onTouchingLetterChangedListener != null) {
-                    if (c >= 0 && c < letterList.size()) {
-                        onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(c));
-                        choose = c;
-                        invalidate();
-                    }
-                }
+                updateLetterByEvent(oldChoose,currenIndex);
                 break;
             case MotionEvent.ACTION_UP:
 
@@ -184,6 +171,15 @@ public class LetterListView extends View {
                 break;
         }
         return true;
+    }
+    public void updateLetterByEvent(int oldChoose,int currenIndex){
+        if (oldChoose != currenIndex && onTouchingLetterChangedListener != null) {
+            if (currenIndex >= 0 && currenIndex< letterList.size()) {
+                onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(currenIndex));
+                choose = currenIndex;
+                invalidate();
+            }
+        }
     }
 
     public void setOnTouchingLetterChangedListener(OnTouchingLetterChangedListener listener) {
