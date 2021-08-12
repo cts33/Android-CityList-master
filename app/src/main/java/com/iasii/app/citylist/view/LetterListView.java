@@ -1,14 +1,26 @@
 package com.iasii.app.citylist.view;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.iasii.app.citylist.R;
 import com.iasii.app.citylist.utils.DensityUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -17,106 +29,167 @@ import com.iasii.app.citylist.utils.DensityUtil;
 public class LetterListView extends View {
 
     private OnTouchingLetterChangedListener onTouchingLetterChangedListener;
-    private String[] b = {"定位", "最近", "热门", "全部", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
+    private String[] defaultLets = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
             "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private List<String> letterList = new ArrayList<>();
     int choose = -1;
     private Paint paint = new Paint();
-    private boolean showBkg = false;
-    private Context context;
-    private int textSize;
-    private int textDefaultColor = Color.parseColor("#8c8c8c");
-    private int textFocusColor = Color.parseColor("#40c60a");
-    private int bgColor = Color.parseColor("#40000000");
 
-    public LetterListView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        setup(context);
+    private Context context;
+    private int textSize = 15;
+    private int width;
+
+    private int textDefaultColor = Color.parseColor("#333333");
+    private int textFocusColor = Color.RED;
+
+    int paddingTop, paddingDown;
+    private Drawable defaultBgDrawable;
+    //每个字母占位的高度值 px
+    private int singleHeight=24;
+
+    public LetterListView(Context context) {
+        this(context, null);
+        this.context = context;
     }
 
     public LetterListView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setup(context);
-    }
-
-    public LetterListView(Context context) {
-        super(context);
-        setup(context);
-    }
-
-    public void setup(Context context) {
+        this(context, attrs, 0);
         this.context = context;
-        textSize = DensityUtil.dp2px(context, 14);
+
     }
+
+    public LetterListView(Context context,
+                          AttributeSet attrs,
+                          int defStyle) {
+
+        super(context, attrs, defStyle);
+
+        this.context = context;
+
+
+        initConfig();
+    }
+
+
+    private void initConfig() {
+        width = DensityUtil.dp2px(context, 50);
+        paddingTop = paddingDown = DensityUtil.dp2px(context, 10);
+
+        defaultBgDrawable = getResources().getDrawable(R.drawable.letter_bg_shape);
+
+        letterList.addAll(Arrays.asList(defaultLets));
+
+    }
+
+    public void setLetters(List<String> letters) {
+
+        if (letters.isEmpty()) {
+            return;
+        }
+        letterList.addAll(letters);
+
+        invalidate();
+    }
+
+    /**
+     * 设置字母字体大小
+     *
+     * @param textSize
+     */
+    public void setTextSize(int textSize, int textDefaultColor) {
+        this.textSize = textSize;
+        this.textDefaultColor = textDefaultColor;
+    }
+
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int height =0;
+        for (int i = 0; i < letterList.size(); i++) {
+            height+=singleHeight;
+        }
+
+        setMeasuredDimension(width, height);
+    }
+
+    private static final String TAG = "LetterListView";
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (showBkg) {
-            canvas.drawColor(bgColor);
-        }
-        int height = getHeight();
-        int width = getWidth();
-        int singleHeight = height / b.length;
-        for (int i = 0; i < b.length; i++) {
+
+        Log.d(TAG, "dispatchTouchEvent: onDraw");
+        int letSize = letterList.size();
+
+
+
+        for (int i = 0; i < letSize; i++) {
             paint.setColor(textDefaultColor);
             paint.setTextSize(textSize);
-//            paint.setTypeface(Typeface.DEFAULT_BOLD);
+
             paint.setAntiAlias(true);
+
+            float xPos = width / 2 - paint.measureText(letterList.get(i)) / 2;
+            float yPos = singleHeight * i + singleHeight;
+
             if (i == choose) {
                 paint.setColor(textFocusColor);
+
                 paint.setFakeBoldText(true);
+
             }
-            float xPos = width / 2 - paint.measureText(b[i]) / 2;
-            float yPos = singleHeight * i + singleHeight;
-            canvas.drawText(b[i], xPos, yPos, paint);
-            paint.reset();
+            canvas.drawText(letterList.get(i), xPos, yPos, paint);
+
+//            paint.reset();
         }
+
     }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         final int action = event.getAction();
         final float y = event.getY();
         final int oldChoose = choose;
-        final OnTouchingLetterChangedListener listener = onTouchingLetterChangedListener;
-        final int c = (int) (y / getHeight() * b.length);
+        //计算事件在哪个字母的下标index
+        final int c = (int) (y / getHeight() * letterList.size());
+        Log.d(TAG, "dispatchTouchEvent: y  = " + y + " getHeight()=" + getHeight());
+        Log.d(TAG, "dispatchTouchEvent: c  = " + c);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                showBkg = true;
-                if (oldChoose != c && listener != null) {
-                    if (c >= 0 && c < b.length) {
-                        listener.onTouchingLetterChanged(b[c]);
+
+                if (oldChoose != c && onTouchingLetterChangedListener != null) {
+                    if (c >= 0 && c < letterList.size()) {
+                        onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(c));
                         choose = c;
                         invalidate();
                     }
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (oldChoose != c && listener != null) {
-                    if (c >= 0 && c < b.length) {
-                        listener.onTouchingLetterChanged(b[c]);
+                if (oldChoose != c && onTouchingLetterChangedListener != null) {
+                    if (c >= 0 && c < letterList.size()) {
+                        onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(c));
                         choose = c;
                         invalidate();
                     }
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                showBkg = false;
-                choose = -1;
+
                 invalidate();
+
                 break;
         }
         return true;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return super.onTouchEvent(event);
-    }
-
     public void setOnTouchingLetterChangedListener(OnTouchingLetterChangedListener listener) {
         this.onTouchingLetterChangedListener = listener;
     }
+
 
     public interface OnTouchingLetterChangedListener {
         void onTouchingLetterChanged(String s);
