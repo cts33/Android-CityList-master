@@ -91,7 +91,6 @@ public class CityListAdapter extends BaseAdapter {
             GridView recentCityView = (GridView) convertView.findViewById(R.id.grid_city);
             recentCityView.setAdapter(new RecentCityAdapter(context, this.historyCities));
             recentCityView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Toast.makeText(context, historyCities.get(position), Toast.LENGTH_SHORT).show();
