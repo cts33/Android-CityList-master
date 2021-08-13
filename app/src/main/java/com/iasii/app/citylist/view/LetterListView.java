@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 import com.iasii.app.citylist.R;
 import com.iasii.app.citylist.utils.DensityUtil;
@@ -39,7 +40,7 @@ public class LetterListView extends View {
 
     private Context context;
     private int textSize = 15;
-    private int width;
+    private int width, height;
 
     private int textDefaultColor = Color.parseColor("#333333");
     private int textFocusColor = Color.RED;
@@ -47,9 +48,9 @@ public class LetterListView extends View {
     int paddingTop, paddingDown;
 
     //每个字母占位的高度值 px
-    private int singleHeight = 24;
+    private int singleHeight;
     //默认选中的第一个元素的y坐标
-    private int selectY =0;
+    private int selectY = 0;
 
     public LetterListView(Context context) {
         this(context, null);
@@ -77,11 +78,28 @@ public class LetterListView extends View {
 
     private void initConfig() {
         width = DensityUtil.dp2px(context, 50);
-        paddingTop = paddingDown = DensityUtil.dp2px(context, 10);
-
-        selectY = singleHeight;
+//        paddingTop = paddingDown = DensityUtil.dp2px(context, 10);
 
         letterList.addAll(Arrays.asList(defaultLets));
+
+        ViewTreeObserver viewTreeObserver = getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                    width = ((View) getParent()).getWidth();
+                    height = ((View) getParent()).getHeight();
+
+                    Log.d(TAG, "viewTreeObserver: " + height);
+                    singleHeight = height / letterList.size();
+                    //默认选中第一个
+                    selectY = singleHeight;
+                    if (singleHeight > 0)
+                        invalidate();
+                }
+            });
+        }
 
     }
 
@@ -111,12 +129,10 @@ public class LetterListView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        Log.d(TAG, "onMeasure: " + getMeasuredHeight());
-        singleHeight = getMeasuredHeight() / letterList.size();
-//        int height = 0;
-//        for (int i = 0; i < letterList.size(); i++) {
-//            height += singleHeight;
-//        }
+        int size = MeasureSpec.getSize(heightMeasureSpec);
+
+        Log.d(TAG, "onMeasure: "+size);
+
         setMeasuredDimension(width, getMeasuredHeight());
     }
 
@@ -128,35 +144,7 @@ public class LetterListView extends View {
 
         Log.d(TAG, "onDraw: ");
 
-        xxx(canvas);
-
-//        int letSize = letterList.size();
-//
-//
-//        for (int i = 0; i < letSize; i++) {
-//
-//            paint.setColor(textDefaultColor);
-//            paint.setTextSize(textSize);
-//
-//            paint.setAntiAlias(true);
-//
-//            float xPos = width / 2 - paint.measureText(letterList.get(i)) / 2;
-//            float yPos = singleHeight * i + singleHeight;
-//
-//            if (i == choose) {
-//                paint.setColor(textFocusColor);
-//
-//                paint.setFakeBoldText(true);
-//
-//            }
-//            String s = letterList.get(i);
-//            Log.d(TAG, "choose: ="+choose);
-//            Log.d(TAG, "onDraw: x="+xPos+"  y="+yPos+"--s="+s);
-//            canvas.drawText(s, xPos, yPos, paint);
-//
-//
-//            paint.reset();
-//        }
+        drawLetterList(canvas);
 
     }
 
@@ -165,23 +153,27 @@ public class LetterListView extends View {
     public void updateSelectIndex(String word) {
 
         selectY = wordXY.get(word);
+        invalidate();
 
     }
 
-    public void xxx(Canvas canvas) {
-        int ytop = 0;
-        String con;
+    public void drawLetterList(Canvas canvas) {
+        int top = 0;
+        String word;
         int letSize = letterList.size();
+        if (singleHeight == 0) {
+            return;
+        }
 
         for (int i = 0; i < letSize; i++) {
 
-            con = letterList.get(i);
-            int y = ytop + singleHeight;
-            RectF rect = new RectF(0, ytop, width, y);//画一个矩形
+            word = letterList.get(i);
+            int bottom = top + singleHeight;
+            RectF rect = new RectF(0, top, width, bottom);//画一个矩形
 
-            wordXY.put(con, ytop + singleHeight);
+            wordXY.put(word, bottom);
 
-            ytop += singleHeight;
+
             Paint mPaint = new Paint();
 
 
@@ -191,12 +183,10 @@ public class LetterListView extends View {
 //            mPaint.setStyle(Paint.Style.FILL);
             //设置抗锯齿
             mPaint.setAntiAlias(true);
-            if (selectY == y) {
+            if (selectY == bottom) {
                 mPaint.setColor(Color.RED);
-
-            } else {
-
             }
+            top += singleHeight;
             canvas.drawCircle(rect.centerX(), rect.centerY(), singleHeight / 2, mPaint);
 
             mPaint.setColor(Color.WHITE);
@@ -206,12 +196,12 @@ public class LetterListView extends View {
             mPaint.setTextAlign(Paint.Align.CENTER);
 
             Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
-            float top = fontMetrics.top;//为基线到字体上边框的距离,即上图中的top
-            float bottom = fontMetrics.bottom;//为基线到字体下边框的距离,即上图中的bottom
+            float t = fontMetrics.top;//为基线到字体上边框的距离,即上图中的top
+            float b = fontMetrics.bottom;//为基线到字体下边框的距离,即上图中的bottom
 
-            int baseLineY = (int) (rect.centerY() - top / 2 - bottom / 2);//基线中间点的y轴计算公式
+            int baseLineY = (int) (rect.centerY() - t / 2 - b / 2);//基线中间点的y轴计算公式
 
-            canvas.drawText(con, rect.centerX(), baseLineY, mPaint);
+            canvas.drawText(word, rect.centerX(), baseLineY, mPaint);
         }
 
     }
@@ -223,8 +213,8 @@ public class LetterListView extends View {
         final int oldChoose = choose;
         //计算事件在哪个字母的下标index
         final int currenIndex = (int) (y / getHeight() * letterList.size());
-        Log.d(TAG, "dispatchTouchEvent: y  = " + y + " getHeight()=" + getHeight());
-        Log.d(TAG, "dispatchTouchEvent: c  = " + currenIndex);
+
+        Log.d(TAG, "dispatchTouchEvent: "+event.getAction());
         switch (action) {
 
             case MotionEvent.ACTION_DOWN:
@@ -232,9 +222,13 @@ public class LetterListView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 updateLetterByEvent(oldChoose, currenIndex);
+                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-
+                String w = letterList.get(currenIndex);
+                choose = currenIndex;
+                //根据字母取出坐标
+                selectY = wordXY.get(w);
                 invalidate();
 
                 break;
@@ -245,9 +239,12 @@ public class LetterListView extends View {
     public void updateLetterByEvent(int oldChoose, int currenIndex) {
         if (oldChoose != currenIndex && onTouchingLetterChangedListener != null) {
             if (currenIndex >= 0 && currenIndex < letterList.size()) {
-                onTouchingLetterChangedListener.onTouchingLetterChanged(letterList.get(currenIndex));
+                String w = letterList.get(currenIndex);
+                onTouchingLetterChangedListener.onTouchingLetterChanged(w);
                 choose = currenIndex;
-                invalidate();
+                //根据字母取出坐标
+                selectY = wordXY.get(w);
+
             }
         }
     }
