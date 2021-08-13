@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements LetterListView.On
         XXXAdapter xxxAdapter = new XXXAdapter(this);
 
         xxxAdapter.addList((List)allCities,R.layout.item_city_cell);
+        xxxAdapter.addList((List)hotCities,R.layout.item_city_cell);
 //        cityListAdapter = new CityListAdapter(this, allCities, hotCities, historyCities, letterIndex);
         recyclerView.setAdapter(xxxAdapter);
     }

@@ -36,16 +36,16 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
     }
 
     /**
-     *
      * 按照顺序 添加类型和数据
      * 1--》list-1
      * 2--> list-2
+     *
      * @param subList
      */
     public void addList(List<Object> subList, @LayoutRes int xmlLayout) {
         typeValue++;
         //代表类型为1，sublist为对应的数据
-        dataLists.put(typeValue,subList);
+        dataLists.put(typeValue, subList);
 
         typeAndXmls.put(typeValue, xmlLayout);
         notifyDataSetChanged();
@@ -53,13 +53,14 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
 
     /**
      * 根据index 找出对应类型
+     *
      * @param position
      * @return
      */
     @Override
     public int getItemViewType(int position) {
 
-        int currIndex=0;
+        int currIndex = 0;
         Set<Map.Entry<Integer, List<Object>>> entries = dataLists.entrySet();
         Iterator<Map.Entry<Integer, List<Object>>> iterator = entries.iterator();
         while (iterator.hasNext()) {
@@ -69,7 +70,7 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
             Integer key = next.getKey();
             for (int i = 0; i < value.size(); i++) {
 
-                if (currIndex==position){
+                if (currIndex == position) {
 
                     return key;
                 }
@@ -103,32 +104,45 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
     public void onBindViewHolder(BaseViewHolder holder, int position) {
 
         // Type  Bean(position)
-
+        int offset;
+        List<Object> value;
+        Integer type;
         Set<Map.Entry<Integer, List<Object>>> entries = dataLists.entrySet();
         Iterator<Map.Entry<Integer, List<Object>>> iterator = entries.iterator();
+        int index=0;
         while (iterator.hasNext()) {
             Map.Entry<Integer, List<Object>> next = iterator.next();
-            Integer type = next.getKey();
-            int offset = getOffset(type);
-            List<Object> value = next.getValue();
+            type = next.getKey();
+            value = next.getValue();
+            offset = getOffset(type);
 
-            // TODO  偏移量
-            attchDataByViewHolder(holder, type, value,position,offset);
+            for (int i = 0; i < value.size(); i++) {
+                if (index==position){
+                    // TODO  偏移量
+                    attchDataByViewHolder(holder, type, value, position, offset);
+                    return;
+                }
+                index++;
+            }
+
 
         }
+
+
     }
 
     /**
      * 计算列表的偏移量
+     *
      * @param type
      * @return
      */
     private int getOffset(Integer type) {
-        int offset=0;
-
-        for (int i = 0; i < type; i++) {
+        int offset = 0;
+        //记录上一个类型的偏移量，所以 -1
+        for (int i = 0; i < type-1; i++) {
             List<Object> objects = dataLists.get(type);
-            offset+=objects.size();
+            offset += objects.size();
         }
         return offset;
     }
