@@ -2,10 +2,12 @@ package com.example.city_demo.xxx;
 
 import android.content.Context;
 
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -86,7 +88,6 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // TODO 查找布局 by type
 
-
         return createVH(viewType, parent);
     }
 
@@ -96,9 +97,7 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
 
         View root = LayoutInflater.from(context).inflate(layoutId, parent, false);
         return new BaseViewHolder(root);
-
     }
-
 
     @Override
     public void onBindViewHolder(BaseViewHolder holder, int position) {
@@ -124,11 +123,7 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
                 }
                 index++;
             }
-
-
         }
-
-
     }
 
     /**
@@ -168,8 +163,24 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
 
     public class BaseViewHolder extends RecyclerView.ViewHolder {
 
+        SparseArray<View> views;
         public BaseViewHolder(View itemView) {
             super(itemView);
+
+            views = new SparseArray<>();
+        }
+
+        public  View getViewById(@IdRes int id){
+
+            View view = views.get(id);
+
+            if (view==null){
+                view = itemView.findViewById(id);
+                views.append(id,view);
+            }else{
+                return views.get(id);
+            }
+            return view;
         }
     }
 }
