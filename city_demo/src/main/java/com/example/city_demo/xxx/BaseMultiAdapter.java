@@ -138,10 +138,12 @@ public abstract class BaseMultiAdapter extends RecyclerView.Adapter<BaseMultiAda
      * @return
      */
     private int getOffset(Integer type) {
+        if (type ==0)
+            return 0;
         int offset = 0;
         //记录上一个类型的偏移量，所以 -1
-        for (int i = 0; i < type-1; i++) {
-            List<Object> objects = dataLists.get(type);
+        for (int i = 0; i <= type-1; i++) {
+            List<Object> objects = dataLists.get(type-1);
             offset += objects.size();
         }
         return offset;
