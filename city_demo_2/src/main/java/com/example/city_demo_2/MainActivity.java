@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.util.SparseArray;
 
 import com.example.city_demo_2.bean.CityBean;
 import com.example.city_demo_2.bean.SuspensionDecoration;
@@ -14,6 +16,8 @@ import com.example.city_demo_2.db.DBDao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
             protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
-                holder.setText(R.id.location,   o.getcName());
+                holder.setText(R.id.location, o.getcName());
 //                holder.setImageResource(R.id.ivAvatar,R.drawable.friend);
             }
         };
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         cityBean.setcName("北京");
         List<CityBean> hotCitys = new ArrayList<>();
         hotCitys.add(cityBean);
-        mHeaderAdapter.setHeaderDataAndView(R.layout.item_city,cityBean,hotCitys);
+        mHeaderAdapter.setHeaderDataAndView(R.layout.item_city, cityBean, hotCitys);
 //        mHeaderAdapter.setHeaderView(R.layout.item_city, cityBean);
 
         recyclerView.setAdapter(mHeaderAdapter);
@@ -59,28 +63,54 @@ public class MainActivity extends AppCompatActivity {
 
         mDecoration.setHeaderViewCount(mHeaderAdapter.getHeaderViewCount());
 
-        recyclerView.addItemDecoration(mDecoration );
+        recyclerView.addItemDecoration(mDecoration);
         //如果add两个，那么按照先后顺序，依次渲染。
         recyclerView.addItemDecoration(new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL));
 
-        initDatas( );
+        initDatas();
     }
 
 
-    private void initDatas( ) {
+    private void initDatas() {
 
+        long l = System.currentTimeMillis();
         List<CityBean> allList = dbDao.getAllList();
 
-        Collections.sort(allList, new Comparator<CityBean>() {
-            @Override
-            public int compare(CityBean o1, CityBean o2) {
-                return o1.getPinyin().compareTo(o2.getPinyin());
-            }
-        });
+        CityBean cityBean = new CityBean();
+        cityBean.setcName("北京");
+        cityBean.setPinyin("");
+        cityBean.setFirstWord("热门");
+        allList.add(cityBean);
 
-        mAdapter.setDatas(allList);
+        Collections.sort(allList);
+
+        HashMap<String,List<CityBean>> hashMap = new LinkedHashMap<>();
+        List<CityBean>  subArray =null ;
+        String currLetter="";
+        for (int i = 0; i < allList.size(); i++) {
+
+            CityBean cc = allList.get(i);
+            String pp = cc.getFirstWord();
+
+
+            //上次字母和本次不一样，证明新数据
+            if(!currLetter.equals(pp)){
+                currLetter = pp;
+                subArray = new ArrayList<>();
+                subArray.add(cc);
+                hashMap.put(pp,subArray);
+            }else{
+                subArray.add(cc);
+            }
+        }
+
+//        mAdapter.setDatas(allList);
+        mAdapter.setDataMap(hashMap);
 
         mHeaderAdapter.notifyDataSetChanged();
         mDecoration.setmDatas(allList);
+        Log.d(TAG, "initDatas: " + ((System.currentTimeMillis() - l)));
     }
+
+    private static final String TAG = "MainActivity";
 }

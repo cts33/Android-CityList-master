@@ -3,7 +3,7 @@ package com.example.city_demo_2.bean;
 /**
  * Created by next on 2016/3/24.
  */
-public class CityBean extends BaseIndexBean{
+public class CityBean extends BaseIndexBean implements Comparable<CityBean> {
 
     private String cName;
     //Latitude and longitude
@@ -14,7 +14,6 @@ public class CityBean extends BaseIndexBean{
 
     public CityBean() {
     }
-
 
 
     public String getcName() {
@@ -42,7 +41,6 @@ public class CityBean extends BaseIndexBean{
     }
 
 
-
     @Override
     public String toString() {
         return "City{" +
@@ -55,5 +53,15 @@ public class CityBean extends BaseIndexBean{
     @Override
     public String getTarget() {
         return cName;
+    }
+
+
+    @Override
+    public int compareTo(CityBean o) {
+        int compare = getPinyin().compareTo(o.getPinyin());
+        if (compare == 0) {
+            return getFirstWord().compareTo(o.getFirstWord());
+        }
+        return compare;
     }
 }

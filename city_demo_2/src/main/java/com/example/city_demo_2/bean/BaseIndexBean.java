@@ -8,8 +8,8 @@ package com.example.city_demo_2.bean;
 
 public abstract class BaseIndexBean implements ISuspensionInterface {
     //所属的分类（城市的汉语拼音首字母）
-    protected String firstWord;
-    protected String pinyin;
+    protected String firstWord="";
+    protected String pinyin="";
 
     public String getPinyin() {
         return pinyin;

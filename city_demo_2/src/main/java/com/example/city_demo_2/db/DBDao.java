@@ -3,6 +3,7 @@ package com.example.city_demo_2.db;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.city_demo_2.bean.CityBean;
@@ -18,24 +19,28 @@ public class DBDao {
         myOpenHelper = new MyOpenHelper(context, "cities.db", null, 3);
     }
 
-    public   List<CityBean> getAllList(){
+    public List<CityBean> getAllList() {
 
         List<CityBean> cityBeanList = new ArrayList<>();
         SQLiteDatabase writableDatabase = myOpenHelper.getWritableDatabase();
         Cursor cursor = writableDatabase.query("city", null, null, null, null, null, null);
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
 
             CityBean cityBean = new CityBean();
 
             Integer id = cursor.getInt(cursor.getColumnIndex("id"));
-            String name  = cursor.getString(cursor.getColumnIndex("name"));
+            String name = cursor.getString(cursor.getColumnIndex("name"));
             String pinyin = cursor.getString(cursor.getColumnIndex("pinyin"));
 
             cityBean.setcName(name);
             cityBean.setPinyin(pinyin);
-           String shou=  pinyin.toUpperCase().toCharArray()[0]+"";
-            Log.d("TAG", "getAllList: "+shou);
-            cityBean.setFirstWord(shou);
+            if (!TextUtils.isEmpty(pinyin)){
+                String shou = pinyin.substring(0,1).toUpperCase();
+                Log.d("TAG", "getAllList: " + shou);
+
+                cityBean.setFirstWord(shou);
+            }
+
             cityBeanList.add(cityBean);
 
         }
