@@ -12,14 +12,10 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 
 public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final int BASE_ITEM_TYPE_HEADER = 1000000;//headerview的viewtype基准值
-    private static final int BASE_ITEM_TYPE_FOOTER = 2000000;//footerView的ViewType基准值
+    private static final int BASE_ITEM_TYPE_HEADER = 11;
 
-    //存放HeaderViews的layoudID和data,key是viewType，value 是 layoudID和data，
-    // 在createViewHOlder里根据layoutId创建UI,
-    // 在onbindViewHOlder里依据这个data渲染UI，同时也将layoutId回传出去用于判断何种Header
+
     private SparseArrayCompat<SparseArrayCompat> mHeaderDatas = new SparseArrayCompat<SparseArrayCompat>();
-    private SparseArrayCompat<View> mFooterViews = new SparseArrayCompat<>();//存放FooterViews,key是viewType
 
     protected RecyclerView.Adapter mInnerAdapter;//内部的的普通Adapter
 
@@ -29,10 +25,6 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
 
     public int getHeaderViewCount() {
         return mHeaderDatas.size();
-    }
-
-    public int getFooterViewCount() {
-        return mFooterViews.size();
     }
 
     private int getInnerItemCount() {
@@ -49,15 +41,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
         return getHeaderViewCount() > position;
     }
 
-    /**
-     * 传入postion判断是否是footerview
-     *
-     * @param position
-     * @return
-     */
-    public boolean isFooterViewPos(int position) {//举例， 2个头，2个inner，pos 0 1 2 3 ,false,4+true
-        return position >= getHeaderViewCount() + getInnerItemCount();
-    }
+
 
     /**
      * 添加HeaderView
@@ -113,14 +97,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
         }
     }
 
-    /**
-     * 添加FooterView
-     *
-     * @param v
-     */
-    public void addFooterView(View v) {
-        mFooterViews.put(mFooterViews.size() + BASE_ITEM_TYPE_FOOTER, v);
-    }
+
 
     /**
      * 清空HeaderView数据
@@ -129,22 +106,11 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
         mHeaderDatas.clear();
     }
 
-    public void clearFooterView() {
-        mFooterViews.clear();
-    }
-
-
-    public void setFooterView(View v) {
-        clearFooterView();
-        addFooterView(v);
-    }
 
     @Override
     public int getItemViewType(int position) {
         if (isHeaderViewPos(position)) {
             return mHeaderDatas.keyAt(position);
-        } else if (isFooterViewPos(position)) {//举例：header 2， innter 2， 0123都不是，4才是，4-2-2 = 0，ok。
-            return mFooterViews.keyAt(position - getHeaderViewCount() - getInnerItemCount());
         }
         return super.getItemViewType(position - getHeaderViewCount());
     }
@@ -156,8 +122,6 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
 //            return new ViewHolder(parent.getContext(), mHeaderDatas.get(viewType));
             //return createHeader(parent, mHeaderViews.indexOfKey(viewType)); 第一种方法是让子类实现这个方法 构建ViewHolder
             return ViewHolder.get(parent.getContext(), null, parent, mHeaderDatas.get(viewType).keyAt(0), -1);
-        } else if (mFooterViews.get(viewType) != null) {//不为空，说明是footerview
-            return new ViewHolder(parent.getContext(), mFooterViews.get(viewType));
         }
         return mInnerAdapter.onCreateViewHolder(parent, viewType);
     }
@@ -171,9 +135,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
             int layoutId = mHeaderDatas.get(getItemViewType(position)).keyAt(0);
             onBindHeaderHolder((ViewHolder) holder, position, layoutId, mHeaderDatas.get(getItemViewType(position)).get(layoutId));
 
-        } else if (isFooterViewPos(position)) {
-            return;
-        }else{
+        }  else{
             mInnerAdapter.onBindViewHolder(holder, position - getHeaderViewCount());
         }
     }
@@ -181,7 +143,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
 
     @Override
     public int getItemCount() {
-        return getInnerItemCount() + getHeaderViewCount() + getFooterViewCount();
+        return getInnerItemCount() + getHeaderViewCount()  ;
     }
 
     @Override
@@ -199,8 +161,6 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
                     int viewType = getItemViewType(position);
                     if (mHeaderDatas.get(viewType) != null) {
                         return gridLayoutManager.getSpanCount();
-                    } else if (mFooterViews.get(viewType) != null) {
-                        return gridLayoutManager.getSpanCount();
                     }
                     if (spanSizeLookup != null)
                         return spanSizeLookup.getSpanSize(position);
@@ -216,7 +176,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
         mInnerAdapter.onViewAttachedToWindow(holder);
         int position = holder.getLayoutPosition();
-        if (isHeaderViewPos(position) || isFooterViewPos(position)) {
+        if (isHeaderViewPos(position)  ) {
             ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
 
             if (lp != null

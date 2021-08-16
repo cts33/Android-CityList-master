@@ -10,22 +10,19 @@ import android.os.Bundle;
 import com.example.city_demo_2.bean.CityBean;
 import com.example.city_demo_2.bean.SuspensionDecoration;
 import com.example.city_demo_2.db.DBDao;
-import com.example.city_demo_2.db.MyOpenHelper;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView mRv;
+    private RecyclerView recyclerView;
     private BaseCityAdapter mAdapter;
     private Header_FooterWrapperAdapter mHeaderAdapter;
-    private LinearLayoutManager mManager;
     private List<CityBean> mDatas;
     private SuspensionDecoration mDecoration;
     private DBDao dbDao;
+    private Header_FooterWrapperAdapter mHeaderAdapter1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,26 +32,31 @@ public class MainActivity extends AppCompatActivity {
 
         dbDao = new DBDao(this);
 
-        mRv = (RecyclerView) findViewById(R.id.rv);
-        mRv.setLayoutManager(mManager = new LinearLayoutManager(this));
+        recyclerView = (RecyclerView) findViewById(R.id.rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
-        mAdapter = new BaseCityAdapter(this, mDatas);
+        mAdapter = new BaseCityAdapter(this);
 
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
             protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, Object o) {
-                holder.setText(R.id.tvCity, (String) o);
-                holder.setImageResource(R.id.ivAvatar,R.drawable.friend);
+                holder.setText(R.id.location, (String) o);
+//                holder.setImageResource(R.id.ivAvatar,R.drawable.friend);
             }
         };
-        mHeaderAdapter.setHeaderView(R.layout.item_city, "测试头部");
 
-        mRv.setAdapter(mHeaderAdapter);
-        mRv.addItemDecoration(mDecoration = new SuspensionDecoration(this, mDatas).setHeaderViewCount(mHeaderAdapter.getHeaderViewCount()));
+        mHeaderAdapter.setHeaderView(R.layout.item_city, "北京");
+
+        recyclerView.setAdapter(mHeaderAdapter);
+
+        mDecoration = new SuspensionDecoration(this, mDatas);
+
+        mDecoration.setHeaderViewCount(mHeaderAdapter.getHeaderViewCount());
+
+        recyclerView.addItemDecoration(mDecoration );
         //如果add两个，那么按照先后顺序，依次渲染。
-        mRv.addItemDecoration(new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL));
-
+        recyclerView.addItemDecoration(new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL));
 
         initDatas( );
     }
@@ -72,8 +74,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mAdapter.setDatas(allList);
-
-
 
         mHeaderAdapter.notifyDataSetChanged();
         mDecoration.setmDatas(allList);

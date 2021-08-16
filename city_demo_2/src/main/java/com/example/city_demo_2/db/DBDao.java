@@ -35,7 +35,7 @@ public class DBDao {
             cityBean.setPinyin(pinyin);
            String shou=  pinyin.toUpperCase().toCharArray()[0]+"";
             Log.d("TAG", "getAllList: "+shou);
-            cityBean.setBaseIndexTag(shou);
+            cityBean.setFirstWord(shou);
             cityBeanList.add(cityBean);
 
         }

@@ -9,17 +9,20 @@
     android:orientation="horizontal"
     android:paddingLeft="15dp">
 
-    <ImageView
-        android:id="@+id/ivAvatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-      />
 
     <TextView
-        android:id="@+id/tvCity"
-        android:layout_width="match_parent"
+        android:id="@+id/curr_location"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
-        tools:text="安徽"/>
+        tools:text="当前位置："/>
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+
+        tools:text="北京"/>
 </LinearLayout>

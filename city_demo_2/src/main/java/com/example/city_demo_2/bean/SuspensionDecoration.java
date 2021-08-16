@@ -17,11 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 /**
- * 介绍：分类、悬停的Decoration
- * 作者：zhangxutong
- * 邮箱：mcxtzhang@163.com
- * 主页：http://blog.csdn.net/zxt0601
- * 时间： 2016/11/7.
+        分类、悬停的Decoration
  */
 
 public class SuspensionDecoration extends RecyclerView.ItemDecoration {
@@ -36,6 +32,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
     private static int COLOR_TITLE_FONT = Color.parseColor("#FF999999");
     private static int mTitleFontSize;//title字体大小
 
+    private int defaultPaddingLeft=15;
     private int mHeaderViewCount = 0;
 
 
@@ -109,7 +106,8 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
                     drawTitleArea(c, left, right, child, params, position);
 
                 } else {//其他的通过判断
-                    if (null != mDatas.get(position).getSuspensionTag() && !mDatas.get(position).getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
+                    if (null != mDatas.get(position).getSuspensionTag() &&
+                            !mDatas.get(position).getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
                         //不为空 且跟前一个tag不一样了，说明是新的分类，也要title
                         drawTitleArea(c, left, right, child, params, position);
                     } else {
@@ -134,12 +132,9 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         mPaint.setColor(COLOR_TITLE_BG);
         c.drawRect(left, child.getTop() - params.topMargin - mTitleHeight, right, child.getTop() - params.topMargin, mPaint);
         mPaint.setColor(COLOR_TITLE_FONT);
-/*
-        Paint.FontMetricsInt fontMetrics = mPaint.getFontMetricsInt();
-        int baseline = (getMeasuredHeight() - fontMetrics.bottom + fontMetrics.top) / 2 - fontMetrics.top;*/
 
         mPaint.getTextBounds(mDatas.get(position).getSuspensionTag(), 0, mDatas.get(position).getSuspensionTag().length(), mBounds);
-        c.drawText(mDatas.get(position).getSuspensionTag(), child.getPaddingLeft(), child.getTop() - params.topMargin - (mTitleHeight / 2 - mBounds.height() / 2), mPaint);
+        c.drawText(mDatas.get(position).getSuspensionTag(), child.getPaddingLeft()+defaultPaddingLeft, child.getTop() - params.topMargin - (mTitleHeight / 2 - mBounds.height() / 2), mPaint);
     }
 
     @Override
@@ -177,69 +172,12 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         c.drawRect(parent.getPaddingLeft(), parent.getPaddingTop(), parent.getRight() - parent.getPaddingRight(), parent.getPaddingTop() + mTitleHeight, mPaint);
         mPaint.setColor(COLOR_TITLE_FONT);
         mPaint.getTextBounds(tag, 0, tag.length(), mBounds);
-        c.drawText(tag, child.getPaddingLeft(),
+        c.drawText(tag, child.getPaddingLeft()+defaultPaddingLeft,
                 parent.getPaddingTop() + mTitleHeight - (mTitleHeight / 2 - mBounds.height() / 2),
                 mPaint);
         if (flag)
             c.restore();//恢复画布到之前保存的状态
 
-
-/*        Button button = new Button(parent.getContext());
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(parent.getContext(), "啊哈", Toast.LENGTH_SHORT).show();//即使给View设置了点击事件，也是无效的，它仅仅draw了
-            }
-        });
-        ViewGroup.LayoutParams params = button.getLayoutParams();
-        if (params == null){
-            params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-        button.setLayoutParams(params);
-        button.setBackgroundColor(Color.RED);
-        button.setText("无哈");
-        *//*button.measure(View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.EXACTLY));
-*//*
-        //必须经过 测量 和 布局，View才能被正常的显示出来
-        button.measure(View.MeasureSpec.makeMeasureSpec(9999,View.MeasureSpec.UNSPECIFIED),View.MeasureSpec.makeMeasureSpec(9999,View.MeasureSpec.UNSPECIFIED));
-        button.layout(parent.getPaddingLeft(),parent.getPaddingTop(),
-                parent.getPaddingLeft()+button.getMeasuredWidth(),parent.getPaddingTop()+button.getMeasuredHeight());
-        button.draw(c);*/
-
-        //inflate一个复杂布局 并draw出来
-/*        View toDrawView = mInflater.inflate(R.layout.header_complex, parent, false);
-        int toDrawWidthSpec;//用于测量的widthMeasureSpec
-        int toDrawHeightSpec;//用于测量的heightMeasureSpec
-        //拿到复杂布局的LayoutParams，如果为空，就new一个。
-        // 后面需要根据这个lp 构建toDrawWidthSpec，toDrawHeightSpec
-        ViewGroup.LayoutParams lp = toDrawView.getLayoutParams();
-        if (lp == null) {
-            lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);//这里是根据复杂布局layout的width height，new一个Lp
-            toDrawView.setLayoutParams(lp);
-        }
-        if (lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
-            //如果是MATCH_PARENT，则用父控件能分配的最大宽度和EXACTLY构建MeasureSpec。
-            toDrawWidthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight(), View.MeasureSpec.EXACTLY);
-        } else if (lp.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            //如果是WRAP_CONTENT，则用父控件能分配的最大宽度和AT_MOST构建MeasureSpec。
-            toDrawWidthSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight(), View.MeasureSpec.AT_MOST);
-        } else {
-            //否则则是具体的宽度数值，则用这个宽度和EXACTLY构建MeasureSpec。
-            toDrawWidthSpec = View.MeasureSpec.makeMeasureSpec(lp.width, View.MeasureSpec.EXACTLY);
-        }
-        //高度同理
-        if (lp.height == ViewGroup.LayoutParams.MATCH_PARENT) {
-            toDrawHeightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight() - parent.getPaddingTop() - parent.getPaddingBottom(), View.MeasureSpec.EXACTLY);
-        } else if (lp.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
-            toDrawHeightSpec = View.MeasureSpec.makeMeasureSpec(parent.getHeight() - parent.getPaddingTop() - parent.getPaddingBottom(), View.MeasureSpec.AT_MOST);
-        } else {
-            toDrawHeightSpec = View.MeasureSpec.makeMeasureSpec(lp.width, View.MeasureSpec.EXACTLY);
-        }
-        //依次调用 measure,layout,draw方法，将复杂头部显示在屏幕上。
-        toDrawView.measure(toDrawWidthSpec, toDrawHeightSpec);
-        toDrawView.layout(parent.getPaddingLeft(), parent.getPaddingTop(),
-                parent.getPaddingLeft() + toDrawView.getMeasuredWidth(), parent.getPaddingTop() + toDrawView.getMeasuredHeight());
-        toDrawView.draw(c);*/
 
     }
 
@@ -262,7 +200,8 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
                 if (position == 0) {
                     outRect.set(0, mTitleHeight, 0, 0);
                 } else {//其他的通过判断
-                    if (null != titleCategoryInterface.getSuspensionTag() && !titleCategoryInterface.getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
+                    if (null != titleCategoryInterface.getSuspensionTag() &&
+                            !titleCategoryInterface.getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
                         //不为空 且跟前一个tag不一样了，说明是新的分类，也要title
                         outRect.set(0, mTitleHeight, 0, 0);
                     }

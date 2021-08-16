@@ -12,22 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.city_demo_2.bean.CityBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHolder> {
 
     protected Context mContext;
-    protected List<CityBean> mDatas;
+    protected List<CityBean> mDatas = new ArrayList<>();
     protected LayoutInflater mInflater;
 
-    public BaseCityAdapter(Context mContext, List<CityBean> mDatas) {
+    public BaseCityAdapter(Context mContext) {
         this.mContext = mContext;
-        this.mDatas = mDatas;
+
         this.mInflater = LayoutInflater.from(mContext);
     }
 
     public BaseCityAdapter setDatas(List<CityBean> datas) {
-        mDatas = datas;
+        this.mDatas.clear();
+        mDatas.addAll(datas);
         return this;
     }
 
