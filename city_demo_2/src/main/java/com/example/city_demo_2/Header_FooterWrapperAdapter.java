@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.city_demo_2.bean.CityBean;
+
+import java.util.List;
+
 
 public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int BASE_ITEM_TYPE_HEADER = 11;
@@ -18,6 +22,8 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     private SparseArrayCompat<SparseArrayCompat> mHeaderDatas = new SparseArrayCompat<SparseArrayCompat>();
 
     protected RecyclerView.Adapter mInnerAdapter;//内部的的普通Adapter
+    //热门城市
+    private List<CityBean> hotBeanList;
 
     public Header_FooterWrapperAdapter(RecyclerView.Adapter mInnerAdapter) {
         this.mInnerAdapter = mInnerAdapter;
@@ -42,7 +48,6 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     }
 
 
-
     /**
      * 添加HeaderView
      *
@@ -54,6 +59,29 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
         SparseArrayCompat headerContainer = new SparseArrayCompat();
         headerContainer.put(layoutId, data);
         mHeaderDatas.put(mHeaderDatas.size() + BASE_ITEM_TYPE_HEADER, headerContainer);
+    }
+
+    /**
+     * 添加头部布局和数据
+     *
+     * @param layoutId    布局id
+     * @param currLoction 当前位置对象
+     * @param hotBeanList 热门对象的集合
+     */
+    public void setHeaderDataAndView(int layoutId, CityBean currLoction, List<CityBean> hotBeanList) {
+
+        this.hotBeanList = hotBeanList;
+        boolean isFinded = false;
+        for (int i = 0; i < mHeaderDatas.size(); i++) {
+            SparseArrayCompat sparse = mHeaderDatas.valueAt(i);
+            if (layoutId == sparse.keyAt(0)) {
+                sparse.setValueAt(0, currLoction);
+                isFinded = true;
+            }
+        }
+        if (!isFinded) {//没发现 说明是addHeaderView
+            addHeaderView(layoutId, currLoction);
+        }
     }
 
     /**
@@ -98,7 +126,6 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     }
 
 
-
     /**
      * 清空HeaderView数据
      */
@@ -118,24 +145,29 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        if (mHeaderDatas.get(viewType) != null) {//不为空，说明是headerview
-//            return new ViewHolder(parent.getContext(), mHeaderDatas.get(viewType));
-            //return createHeader(parent, mHeaderViews.indexOfKey(viewType)); 第一种方法是让子类实现这个方法 构建ViewHolder
-            return ViewHolder.get(parent.getContext(), null, parent, mHeaderDatas.get(viewType).keyAt(0), -1);
+        if (mHeaderDatas.get(viewType) != null) {
+
+            int layoutid = mHeaderDatas.get(viewType).keyAt(0);
+
+            return ViewHolder.get(parent.getContext(), null, parent, layoutid, -1);
+        } else {
+
+            return mInnerAdapter.onCreateViewHolder(parent, viewType);
         }
-        return mInnerAdapter.onCreateViewHolder(parent, viewType);
     }
 
-    protected abstract void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, Object o);
+    protected abstract void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o);
     //多回传一个layoutId出去，用于判断是第几个headerview
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (isHeaderViewPos(position)) {
             int layoutId = mHeaderDatas.get(getItemViewType(position)).keyAt(0);
-            onBindHeaderHolder((ViewHolder) holder, position, layoutId, mHeaderDatas.get(getItemViewType(position)).get(layoutId));
+            CityBean cityBean = (CityBean) mHeaderDatas.get(getItemViewType(position)).get(layoutId);
 
-        }  else{
+            onBindHeaderHolder((ViewHolder) holder, position, layoutId,cityBean );
+
+        } else {
             mInnerAdapter.onBindViewHolder(holder, position - getHeaderViewCount());
         }
     }
@@ -143,7 +175,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
 
     @Override
     public int getItemCount() {
-        return getInnerItemCount() + getHeaderViewCount()  ;
+        return getInnerItemCount() + getHeaderViewCount();
     }
 
     @Override
@@ -176,7 +208,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
         mInnerAdapter.onViewAttachedToWindow(holder);
         int position = holder.getLayoutPosition();
-        if (isHeaderViewPos(position)  ) {
+        if (isHeaderViewPos(position)) {
             ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
 
             if (lp != null

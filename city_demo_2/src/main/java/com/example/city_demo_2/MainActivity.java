@@ -11,6 +11,7 @@ import com.example.city_demo_2.bean.CityBean;
 import com.example.city_demo_2.bean.SuspensionDecoration;
 import com.example.city_demo_2.db.DBDao;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private List<CityBean> mDatas;
     private SuspensionDecoration mDecoration;
     private DBDao dbDao;
-    private Header_FooterWrapperAdapter mHeaderAdapter1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
-            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, Object o) {
-                holder.setText(R.id.location, (String) o);
+            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
+                holder.setText(R.id.location,   o.getcName());
 //                holder.setImageResource(R.id.ivAvatar,R.drawable.friend);
             }
         };
 
-        mHeaderAdapter.setHeaderView(R.layout.item_city, "北京");
+        CityBean cityBean = new CityBean();
+        cityBean.setcName("北京");
+        List<CityBean> hotCitys = new ArrayList<>();
+        hotCitys.add(cityBean);
+        mHeaderAdapter.setHeaderDataAndView(R.layout.item_city,cityBean,hotCitys);
+//        mHeaderAdapter.setHeaderView(R.layout.item_city, cityBean);
 
         recyclerView.setAdapter(mHeaderAdapter);
 
