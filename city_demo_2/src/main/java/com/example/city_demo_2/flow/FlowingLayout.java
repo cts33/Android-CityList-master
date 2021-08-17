@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,6 @@ public class FlowingLayout extends ViewGroup {
 
     private final int mGravity;
 
-
     private static final int LEFT = -1;
     private static final int CENTER = 0;
     private static final int RIGHT = 1;
@@ -36,6 +33,9 @@ public class FlowingLayout extends ViewGroup {
             changeAdapter();
         }
     };
+    /**
+     * item 的内边距
+     */
     private int l =15;
     private int t =5;
     private int r =15;
@@ -71,9 +71,6 @@ public class FlowingLayout extends ViewGroup {
         int modeWidth = MeasureSpec.getMode(widthMeasureSpec);
         int modeHeight = MeasureSpec.getMode(heightMeasureSpec);
 
-//        if (modeWidth == MeasureSpec.AT_MOST) {
-//            throw new RuntimeException("FlowLayout: layout_width  must not  be set to wrap_content !!!");
-//        }
 //        当前控件的宽度
         int width =0;
 
@@ -88,24 +85,14 @@ public class FlowingLayout extends ViewGroup {
         for (int i = 0; i < childCount; i++) {
 
             View child = getChildAt(i);
-            if (child.getVisibility() == View.GONE) {
-                //判断最后一个，计算自身宽高
-                if (i == childCount - 1) {
-                    width = Math.max(lineWidth, width);
-                    height += lineHeight;
-                }
-                continue;
-            }
+
             //测量子元素的宽高
             measureChild(child, widthMeasureSpec, heightMeasureSpec);
 
 
-//            MarginLayoutParams lp = (MarginLayoutParams) child
-//                    .getLayoutParams();
 //            获取子元素的宽高
             int childWidth = child.getMeasuredWidth() + leftMargin  + rightMargin;;
             int childHeight = child.getMeasuredHeight() + topMargin + bottomMargin;;
-
 
 
             if (lineWidth + childWidth > widthSize) {
@@ -224,8 +211,6 @@ public class FlowingLayout extends ViewGroup {
             View child = getChildAt(i);
             if (child.getVisibility() == View.GONE) continue;
 
-//            MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();
-
             //子元素的宽高
             int childWidth = child.getMeasuredWidth();
             int childHeight = child.getMeasuredHeight();
@@ -342,6 +327,27 @@ public class FlowingLayout extends ViewGroup {
 
     }
 
+    public <T> void setOnItemClick(OnItemTagListener onItemTagListener){
+        if (mTagAdapter==null){
+           throw new NullPointerException("adapter is null!");
+        }
+
+        mTagAdapter.setIOnItemClickListener(new CommonFlowAdapter.IOnItemClickListener<T>() {
+            @Override
+            public void onClickItem(T t) {
+
+                if (onItemTagListener!=null){
+                    onItemTagListener.selectItem(t);
+                }
+            }
+        });
+    }
+
+    public interface OnItemTagListener<T>{
+
+        void selectItem(T t);
+    }
+
     private void changeAdapter() {
         removeAllViews();
         TagView tagLayout = null;
@@ -350,35 +356,17 @@ public class FlowingLayout extends ViewGroup {
 //            获取内部子元素控件
             View child = mTagAdapter.getView(this, i, mTagAdapter.getItem(i));
 
-            mTagAdapter.getTextView().setTextColor(textChildColor);
 
+            mTagAdapter.getTextView().setTextColor(textChildColor);
 
             tagLayout = new TagView(getContext());
 
-
             child.setPadding(l,t,r,b);
 
-//            if (child.getLayoutParams() != null) {
-//                tagLayout.setLayoutParams(child.getLayoutParams());
-//            } else {
-//                MarginLayoutParams lp = new MarginLayoutParams( LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//                lp.setMargins( leftMargin , topMargin, rightMargin, bottomMargin);
-//
-//                tagLayout.setLayoutParams(lp);
-//            }
-//            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-//            child.setLayoutParams(lp);
             tagLayout.addView(child);
-
-
 
             addView(tagLayout);
 
-
-
         }
-
     }
-
-
 }

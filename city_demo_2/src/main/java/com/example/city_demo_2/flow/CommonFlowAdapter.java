@@ -15,14 +15,12 @@ import com.example.city_demo_2.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import static androidx.core.util.Preconditions.checkNotNull;
 
 public abstract class CommonFlowAdapter<T> extends FlowBaseAdapter<T> {
     protected List<T> mDatas = new ArrayList<>();
     private int mLayoutId = R.layout.flow_item;
     private Context mContext;
     private FlowHolder holder;
-//    private GradientDrawable radiusBg;
     private int strokeWidth = 1;
     private float radius = 15;
 
@@ -74,6 +72,14 @@ public abstract class CommonFlowAdapter<T> extends FlowBaseAdapter<T> {
         getTextView().setBackground(getDrawable());
         getTextView().setDuplicateParentStateEnabled(true);
 
+        holder.getConvertView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (iOnItemClickListener!=null){
+                    iOnItemClickListener.onClickItem(item);
+                }
+            }
+        });
 
         convert(holder, mDatas.get(i), i);
         return holder.getConvertView();
@@ -85,6 +91,17 @@ public abstract class CommonFlowAdapter<T> extends FlowBaseAdapter<T> {
 
 
     public abstract void convert(FlowHolder holder, T item, int position);
+
+
+    private IOnItemClickListener iOnItemClickListener;
+
+    public void setIOnItemClickListener(IOnItemClickListener iOnItemClickListener) {
+        this.iOnItemClickListener = iOnItemClickListener;
+    }
+
+    public interface IOnItemClickListener<T>{
+        void onClickItem(T t);
+    }
 
     public class FlowHolder {
         private SparseArray<View> mViews;
@@ -128,4 +145,5 @@ public abstract class CommonFlowAdapter<T> extends FlowBaseAdapter<T> {
             return mConvertView;
         }
     }
+
 }

@@ -79,6 +79,15 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
                         return value.get(pos);
                     }
                 });
+
+                holder.flowingLayout.setOnItemClick(new FlowingLayout.OnItemTagListener<CityBean>() {
+                    @Override
+                    public void selectItem(CityBean o) {
+                        Toast.makeText(mContext, ""+o.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
             }
             index++;
         }
