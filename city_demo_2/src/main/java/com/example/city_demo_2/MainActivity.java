@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.city_demo_2.citylist.Header_FooterWrapperAdapter;
 import com.example.city_demo_2.citylist.bean.CityBean;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged( RecyclerView recyclerView, int scrollState) {
                 super.onScrollStateChanged(recyclerView, scrollState);
-                if (scrollState == RecyclerView.SCROLL_STATE_DRAGGING ) {
+                if (scrollState == RecyclerView.SCROLL_STATE_DRAGGING||scrollState==RecyclerView.SCROLL_STATE_SETTLING ) {
                     isScroll = true;
                 }
             }
@@ -91,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recy.getLayoutManager();
 
                 int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-
+                Log.d(TAG, "onScrolled: "+dy);
+//                recyclerView.scrollToPosition(firstVisibleItemPosition);
 
             }
         });
@@ -153,11 +155,20 @@ public class MainActivity extends AppCompatActivity {
         letterListView.setOnTouchingLetterChangedListener(new LetterListView.OnTouchingLetterChangedListener() {
             @Override
             public void onTouchingLetterChanged(String s) {
-                Log.d(TAG, "onTouchingLetterChanged: "+s);
+
                 int base=65;
                 char index = s.toCharArray()[0];
-                if (index>='A'||index<='Z')
-                    recyclerView.smoothScrollToPosition(index-base+1);
+
+                View childAt = recyclerView.getFocusedChild();
+//                int top = childAt.getTop();
+//                Log.d(TAG, "onTouchingLetterChanged: "+top);
+//                recyclerView.scrollBy(0,-top);
+//                if (index>='A'||index<='Z')
+//                    recyclerView.smoothScrollToPosition(index-base+1);
+
+//
+//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//                layoutManager.
 
             }
         });

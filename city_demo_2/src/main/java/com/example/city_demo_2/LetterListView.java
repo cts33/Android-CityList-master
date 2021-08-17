@@ -47,6 +47,8 @@ public class LetterListView extends View {
     private int textDefaultColor = Color.parseColor("#333333");
     private int textFocusColor = Color.RED;
 
+    private HashMap<String, Integer> wordXY = new HashMap();
+
     //每个字母占位的高度值 px
     private int singleHeight;
     //默认选中的第一个元素的y坐标
@@ -101,6 +103,7 @@ public class LetterListView extends View {
             return;
         }
         this.letterList.clear();
+
         letterList.addAll(letters);
 
         invalidate();
@@ -122,8 +125,6 @@ public class LetterListView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int size = MeasureSpec.getSize(heightMeasureSpec);
-
 
         setMeasuredDimension(width, getMeasuredHeight());
     }
@@ -139,7 +140,6 @@ public class LetterListView extends View {
 
     }
 
-    private HashMap<String, Integer> wordXY = new HashMap();
 
     public void updateSelectIndex(String word) {
 
@@ -167,21 +167,19 @@ public class LetterListView extends View {
 
             Paint mPaint = new Paint();
 
-
-            canvas.drawRect(rect, mPaint);
+//            canvas.drawRect(rect, mPaint);
 
             //设置画笔的样式，空心STROKE
 //            mPaint.setStyle(Paint.Style.FILL);
             //设置抗锯齿
-            mPaint.setAntiAlias(true);
-            if (selectY == bottom) {
-                mPaint.setColor(Color.RED);
-            }
-            top += singleHeight;
-            canvas.drawCircle(rect.centerX(), rect.centerY(), singleHeight / 2, mPaint);
+//            mPaint.setAntiAlias(true);
 
-            mPaint.setColor(Color.WHITE);
+            top += singleHeight;
+//            canvas.drawCircle(rect.centerX(), rect.centerY(), singleHeight / 2, mPaint);
+
+            mPaint.setColor(Color.BLACK);
             mPaint.setTextSize(22);
+
             mPaint.setStyle(Paint.Style.FILL);
             //该方法即为设置基线上那个点究竟是left,center,还是right  这里我设置为center
             mPaint.setTextAlign(Paint.Align.CENTER);
@@ -191,6 +189,11 @@ public class LetterListView extends View {
             float b = fontMetrics.bottom;//为基线到字体下边框的距离,即上图中的bottom
 
             int baseLineY = (int) (rect.centerY() - t / 2 - b / 2);//基线中间点的y轴计算公式
+
+            if (selectY == bottom) {
+                mPaint.setColor(Color.RED);
+
+            }
 
             canvas.drawText(word, rect.centerX(), baseLineY, mPaint);
         }
