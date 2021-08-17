@@ -25,10 +25,9 @@ import java.util.Map;
 public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHolder> {
 
     protected Context mContext;
-//    protected List<CityBean> mDatas = new ArrayList<>();
-    protected HashMap<String,List<CityBean>> hashMap = new LinkedHashMap<>();
+    //    protected List<CityBean> mDatas = new ArrayList<>();
+    protected HashMap<String, List<CityBean>> hashMap = new LinkedHashMap<>();
     protected LayoutInflater mInflater;
-    private int index;
 
     public BaseCityAdapter(Context mContext) {
         this.mContext = mContext;
@@ -36,7 +35,7 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
         this.mInflater = LayoutInflater.from(mContext);
     }
 
-    public BaseCityAdapter setDataMap(HashMap<String,List<CityBean>> hashMap) {
+    public BaseCityAdapter setDataMap(HashMap<String, List<CityBean>> hashMap) {
         this.hashMap.clear();
         this.hashMap.putAll(hashMap);
         notifyDataSetChanged();
@@ -49,51 +48,47 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
 //    }
 
     @Override
-    public BaseCityAdapter.ViewHolder onCreateViewHolder(@NonNull  ViewGroup parent, int viewType) {
+    public BaseCityAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View inflate = mInflater.inflate(R.layout.recycler_item, parent, false);
         return new ViewHolder(inflate);
     }
 
     private static final String TAG = "BaseCityAdapter";
+
     @Override
-    public void onBindViewHolder(@NonNull  BaseCityAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseCityAdapter.ViewHolder holder, int position) {
+        int index = 0;
 
-        if (position==0){
-
-
-            return;
-        }
         Iterator<Map.Entry<String, List<CityBean>>> iterator = this.hashMap.entrySet().iterator();
-        while (iterator.hasNext()){
-            index++;
+        while (iterator.hasNext()) {
+
             Map.Entry<String, List<CityBean>> next = iterator.next();
-            String key = next.getKey();
-            List<CityBean> value = next.getValue();
-            Log.d(TAG, "onBindViewHolder: "+key+"---"+value.size());
+            if (index == position) {
+                String key = next.getKey();
+                List<CityBean> value = next.getValue();
+                Log.d(TAG, "onBindViewHolder: "+key+"---"+value.size());
+//
+                holder.flowingLayout.setAdapter(new CommonFlowAdapter<CityBean>(mContext,value) {
+                    @Override
+                    public void convert(FlowHolder holder, CityBean item, int position) {
+                        holder.setText(item.getcName());
+                    }
 
-            holder.flowingLayout.setAdapter(new CommonFlowAdapter<CityBean>(mContext,value) {
-                @Override
-                public void convert(FlowHolder holder, CityBean item, int position) {
-                    holder.setText(item.getcName());
-                }
-
-                @Override
-                public CityBean getItem(int pos) {
-                    return value.get(pos);
-                }
-            });
-
+                    @Override
+                    public CityBean getItem(int pos) {
+                        return value.get(pos);
+                    }
+                });
+            }
+            index++;
         }
-
-
-
 //        holder.avatar.setImageResource(R.drawable.);
     }
 
 
     @Override
     public int getItemCount() {
-        return hashMap.size() ;
+        return hashMap.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

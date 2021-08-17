@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private List<CityBean> mDatas;
     private SuspensionDecoration mDecoration;
     private DBDao dbDao;
+    private HashMap<String, List<CityBean>> hashMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(mHeaderAdapter);
 
-        mDecoration = new SuspensionDecoration(this, mDatas);
+        mDecoration = new SuspensionDecoration(this, hashMap);
 
         mDecoration.setHeaderViewCount(mHeaderAdapter.getHeaderViewCount());
 
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
         Collections.sort(allList);
 
-        HashMap<String,List<CityBean>> hashMap = new LinkedHashMap<>();
+        hashMap = new LinkedHashMap<>();
         List<CityBean>  subArray =null ;
         String currLetter="";
         for (int i = 0; i < allList.size(); i++) {
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.setDataMap(hashMap);
 
         mHeaderAdapter.notifyDataSetChanged();
-        mDecoration.setmDatas(allList);
+        mDecoration.setmDatas(hashMap);
         Log.d(TAG, "initDatas: " + ((System.currentTimeMillis() - l)));
     }
 

@@ -14,14 +14,20 @@ import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
         分类、悬停的Decoration
  */
 
 public class SuspensionDecoration extends RecyclerView.ItemDecoration {
-    private List<? extends ISuspensionInterface> mDatas;
+//    private List<? extends ISuspensionInterface> mDatas;
+
+    private HashMap<String,List<CityBean>> hashMap = new LinkedHashMap<>();
     private Paint mPaint;
     private Rect mBounds;//用于存放测量文字Rect
 
@@ -36,9 +42,9 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
     private int mHeaderViewCount = 0;
 
 
-    public SuspensionDecoration(Context context, List<? extends ISuspensionInterface> datas) {
+    public SuspensionDecoration(Context context, HashMap<String,List<CityBean>> hashMap) {
         super();
-        mDatas = datas;
+        this.hashMap = hashMap;
         mPaint = new Paint();
         mBounds = new Rect();
         mTitleHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, context.getResources().getDisplayMetrics());
@@ -70,8 +76,8 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         return this;
     }
 
-    public SuspensionDecoration setmDatas(List<? extends ISuspensionInterface> mDatas) {
-        this.mDatas = mDatas;
+    public SuspensionDecoration setmDatas(HashMap<String,List<CityBean>> hashMap  ) {
+        this.hashMap = hashMap;
         return this;
     }
 
@@ -97,7 +103,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
             int position = params.getViewLayoutPosition();
             position -= getHeaderViewCount();
             //pos为1，size为1，1>0? true
-            if (mDatas == null || mDatas.isEmpty() || position > mDatas.size() - 1 || position < 0 || !mDatas.get(position).isShowSuspension()) {
+            if (hashMap == null || hashMap.isEmpty() || position > hashMap.size() - 1 || position < 0 /**|| !hashMap.get(position).isShowSuspension()**/) {
                 continue;//越界
             }
             //我记得Rv的item position在重置时可能为-1.保险点判断一下吧
@@ -106,13 +112,11 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
                     drawTitleArea(c, left, right, child, params, position);
 
                 } else {//其他的通过判断
-                    if (null != mDatas.get(position).getSuspensionTag() &&
-                            !mDatas.get(position).getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
+//                    if (null != mDatas.get(position).getSuspensionTag() &&
+//                            !mDatas.get(position).getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
                         //不为空 且跟前一个tag不一样了，说明是新的分类，也要title
                         drawTitleArea(c, left, right, child, params, position);
-                    } else {
-                        //none
-                    }
+//                    }
                 }
             }
         }
@@ -133,8 +137,30 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         c.drawRect(left, child.getTop() - params.topMargin - mTitleHeight, right, child.getTop() - params.topMargin, mPaint);
         mPaint.setColor(COLOR_TITLE_FONT);
 
-        mPaint.getTextBounds(mDatas.get(position).getSuspensionTag(), 0, mDatas.get(position).getSuspensionTag().length(), mBounds);
-        c.drawText(mDatas.get(position).getSuspensionTag(), child.getPaddingLeft()+defaultPaddingLeft, child.getTop() - params.topMargin - (mTitleHeight / 2 - mBounds.height() / 2), mPaint);
+        mPaint.getTextBounds(getSuspensionFirstWord(position), 0, getSuspensionFirstWord(position).length(), mBounds);
+        c.drawText(getSuspensionFirstWord(position), child.getPaddingLeft()+defaultPaddingLeft, child.getTop() - params.topMargin - (mTitleHeight / 2 - mBounds.height() / 2), mPaint);
+    }
+
+
+    /**
+     * 根据下标 从hashmap取出 每个条目的首字母
+     * @param pos
+     * @return
+     */
+    public String getSuspensionFirstWord(int pos){
+        int index=0;
+
+        Iterator<Map.Entry<String, List<CityBean>>> iterator = hashMap.entrySet().iterator();
+
+        while (iterator.hasNext()){
+            Map.Entry<String, List<CityBean>> next = iterator.next();
+            if (index==pos){
+                String key = next.getKey();
+                return key!=null? key:"";
+            }
+            index++;
+        }
+        return "";
     }
 
     @Override
@@ -142,17 +168,17 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         int pos = ((LinearLayoutManager) (parent.getLayoutManager())).findFirstVisibleItemPosition();
         pos -= getHeaderViewCount();
         //pos为1，size为1，1>0? true
-        if (mDatas == null || mDatas.isEmpty() || pos > mDatas.size() - 1 || pos < 0 || !mDatas.get(pos).isShowSuspension()) {
+        if (hashMap == null || hashMap.isEmpty() || pos > hashMap.size() - 1 || pos < 0 /**|| !mDatas.get(pos).isShowSuspension()**/) {
             return;//越界
         }
 
-        String tag = mDatas.get(pos).getSuspensionTag();
+        String tag = getSuspensionFirstWord(pos);
         //View child = parent.getChildAt(pos);
         View child = parent.findViewHolderForLayoutPosition(pos + getHeaderViewCount()).itemView;//出现一个奇怪的bug，有时候child为空，所以将 child = parent.getChildAt(i)。-》 parent.findViewHolderForLayoutPosition(pos).itemView
 
         boolean flag = false;//定义一个flag，Canvas是否位移过的标志
-        if ((pos + 1) < mDatas.size()) {//防止数组越界（一般情况不会出现）
-            if (null != tag && !tag.equals(mDatas.get(pos + 1).getSuspensionTag())) {//当前第一个可见的Item的tag，不等于其后一个item的tag，说明悬浮的View要切换了
+        if ((pos + 1) < hashMap.size()) {//防止数组越界（一般情况不会出现）
+            if (null != tag && !tag.equals(getSuspensionFirstWord(pos+1))) {//当前第一个可见的Item的tag，不等于其后一个item的tag，说明悬浮的View要切换了
                 Log.d("zxt", "onDrawOver() called with: c = [" + child.getTop());//当getTop开始变负，它的绝对值，是第一个可见的Item移出屏幕的距离，
                 if (child.getHeight() + child.getTop() < mTitleHeight) {//当第一个可见的item在屏幕中还剩的高度小于title区域的高度时，我们也该开始做悬浮Title的“交换动画”
                     c.save();//每次绘制前 保存当前Canvas状态，
@@ -187,26 +213,28 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         super.getItemOffsets(outRect, view, parent, state);
         int position = ((RecyclerView.LayoutParams) view.getLayoutParams()).getViewLayoutPosition();
         position -= getHeaderViewCount();
-        if (mDatas == null || mDatas.isEmpty() || position > mDatas.size() - 1) {//pos为1，size为1，1>0? true
+        if (hashMap == null || hashMap.isEmpty() || position > hashMap.size() - 1) {//pos为1，size为1，1>0? true
             return;//越界
         }
         //我记得Rv的item position在重置时可能为-1.保险点判断一下吧
         if (position > -1) {
-            ISuspensionInterface titleCategoryInterface = mDatas.get(position);
+
+            String suspensionFirstWord = getSuspensionFirstWord(position);
+
+//            ISuspensionInterface titleCategoryInterface = mDatas.get(position);
             //等于0肯定要有title的,
             // 2016 11 07 add 考虑到headerView 等于0 也不应该有title
             // 2016 11 10 add 通过接口里的isShowSuspension() 方法，先过滤掉不想显示悬停的item
-            if (titleCategoryInterface.isShowSuspension()) {
+//            if (titleCategoryInterface.isShowSuspension()) {
                 if (position == 0) {
                     outRect.set(0, mTitleHeight, 0, 0);
                 } else {//其他的通过判断
-                    if (null != titleCategoryInterface.getSuspensionTag() &&
-                            !titleCategoryInterface.getSuspensionTag().equals(mDatas.get(position - 1).getSuspensionTag())) {
+                    if ( !suspensionFirstWord.equals(getSuspensionFirstWord(position-1))) {
                         //不为空 且跟前一个tag不一样了，说明是新的分类，也要title
                         outRect.set(0, mTitleHeight, 0, 0);
                     }
                 }
-            }
+//            }
         }
     }
 
