@@ -1,4 +1,4 @@
-package com.example.city_demo_2.bean;
+package com.example.city_demo_2.citylist.bean;
 
 /**
  * 介绍：分类悬停的接口

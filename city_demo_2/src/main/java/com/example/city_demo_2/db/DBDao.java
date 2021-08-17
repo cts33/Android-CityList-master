@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.city_demo_2.bean.CityBean;
+import com.example.city_demo_2.citylist.bean.CityBean;
 
 import java.util.ArrayList;
 import java.util.List;

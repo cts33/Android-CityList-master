@@ -1,4 +1,4 @@
-package com.example.city_demo_2.bean;
+package com.example.city_demo_2.citylist.bean;
 
 /**
  * Created by next on 2016/3/24.

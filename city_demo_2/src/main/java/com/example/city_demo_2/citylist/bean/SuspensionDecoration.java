@@ -1,4 +1,4 @@
-package com.example.city_demo_2.bean;
+package com.example.city_demo_2.citylist.bean;
 
 import android.content.Context;
 import android.graphics.Canvas;
