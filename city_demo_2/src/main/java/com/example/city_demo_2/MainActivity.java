@@ -77,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
         long l = System.currentTimeMillis();
         List<CityBean> allList = dbDao.getAllList();
 
-        CityBean cityBean = new CityBean();
-        cityBean.setcName("北京");
-        cityBean.setPinyin("");
-        cityBean.setFirstWord("热门");
-        allList.add(cityBean);
+//        CityBean cityBean = new CityBean();
+//        cityBean.setcName("北京");
+//        cityBean.setPinyin("");
+//        cityBean.setFirstWord("热门");
+//        allList.add(cityBean);
 
         Collections.sort(allList);
 
