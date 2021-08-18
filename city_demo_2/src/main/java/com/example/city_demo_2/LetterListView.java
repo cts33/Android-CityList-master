@@ -28,7 +28,10 @@ import androidx.annotation.RequiresApi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -52,12 +55,13 @@ public class LetterListView extends View {
     private int textDefaultColor = Color.parseColor("#333333");
     private int textFocusColor = Color.RED;
 
-    private HashMap<String, Float> wordXY = new HashMap();
+    private HashMap<String, Float> wordXY = new LinkedHashMap();
 
     //每个字母占位的高度值 px
     private float singleHeight = 50;
     //默认选中的第一个元素的y坐标
     private float selectY = 0;
+    private boolean isClickEvent;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context) {
@@ -169,6 +173,9 @@ public class LetterListView extends View {
 
 
     public void updateSelectIndex(String word) {
+        //如果是滑动事件，不处理
+        if (isClickEvent)
+            return;
 
         if (System.currentTimeMillis() - lastClickTime < FAST_CLICK_DELAY_TIME) {
 
@@ -232,12 +239,13 @@ public class LetterListView extends View {
         final float y = event.getY();
         final int oldChoose = choose;
         //计算事件在哪个字母的下标index
-        final int currenIndex = (int) (y / getHeight() * letterList.size());
-
+//        final int currenIndex = (int) (y / getHeight() * letterList.size());
+        final int currenIndex = getCurrIndex(y);
 
         switch (action) {
 
             case MotionEvent.ACTION_DOWN:
+               isClickEvent = true;
                 updateLetterByEvent(oldChoose, currenIndex);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -250,10 +258,33 @@ public class LetterListView extends View {
                 //根据字母取出坐标
                 selectY = wordXY.get(w);
                 invalidate();
-
+                isClickEvent = false;
                 break;
         }
         return true;
+    }
+
+    /**
+     * 通过记录的坐标集合，计算出点击是第几个位置
+     * @param y
+     * @return
+     */
+    private int getCurrIndex(float y) {
+        Iterator<Map.Entry<String, Float>> iterator = wordXY.entrySet().iterator();
+        float pre = 0;
+        int pos = 0;
+        while (iterator.hasNext()) {
+            Map.Entry<String, Float> next = iterator.next();
+            Float value = next.getValue();
+            if (y >= pre && y <= value) {
+                    return pos;
+            }
+            pre = value;
+            pos++;
+        }
+
+
+        return -1;
     }
 
     private void updateLetterByEvent(int oldChoose, int currenIndex) {
