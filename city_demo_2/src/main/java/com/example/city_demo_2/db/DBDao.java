@@ -25,7 +25,7 @@ public class DBDao {
     private Context context;
 
     public DBDao(Context context) {
-        myOpenHelper = new MyOpenHelper(context, "city_list.db", null, 1);
+        myOpenHelper = new MyOpenHelper(context, "cities.db", null, 3);
 
         this.context = context;
     }

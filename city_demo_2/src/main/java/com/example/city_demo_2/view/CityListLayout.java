@@ -25,6 +25,7 @@ import com.example.city_demo_2.PingYinUtil;
 import com.example.city_demo_2.R;
 import com.example.city_demo_2.citylist.BaseCityAdapter;
 import com.example.city_demo_2.citylist.Header_FooterWrapperAdapter;
+import com.example.city_demo_2.citylist.ViewHolder;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 
@@ -186,18 +187,17 @@ public class CityListLayout extends LinearLayout {
     public void addCurrLocation(CityBean currCityBean, @LayoutRes int layoutid) {
 
         if (mAdapter == null) {
-            return;
+            mAdapter = new BaseCityAdapter(getContext());
         }
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
-            protected void onBindHeaderHolder(com.example.city_demo_2.ViewHolder holder, int headerPos, int layoutId, CityBean o) {
+            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
                 holder.setText(R.id.location, o.getcName());
             }
         };
 
         mHeaderAdapter.addHeaderView(layoutid, currCityBean);
 
-        recyclerView.setAdapter(mHeaderAdapter);
 
     }
 
@@ -205,7 +205,6 @@ public class CityListLayout extends LinearLayout {
     /**
      * key  代表特殊类型，如：热门城市，历史
      * 0--热门
-     *
      *
      * @param specialBeanListList
      */
@@ -259,7 +258,11 @@ public class CityListLayout extends LinearLayout {
         if (recyclerView == null) {
             throw new NullPointerException("recyclerview is null!");
         }
-        mAdapter = new BaseCityAdapter(getContext());
+        if (mAdapter == null) {
+            mAdapter = new BaseCityAdapter(getContext());
+        }
+        mAdapter.setDataMap(hashMap);
+
         addItemDecoration();
         //如果没有头部适配器，说明没有添加头部类型
         if (mHeaderAdapter == null) {
@@ -267,8 +270,6 @@ public class CityListLayout extends LinearLayout {
         } else {
             recyclerView.setAdapter(mHeaderAdapter);
         }
-
-        mAdapter.setDataMap(hashMap);
 
     }
 
@@ -314,9 +315,15 @@ public class CityListLayout extends LinearLayout {
         //添加分割线
         mDecoration = new SuspensionDecoration(getContext(), hashMap);
 
+        if (mHeaderAdapter != null) {
+
+            mDecoration.setHeaderViewCount(mHeaderAdapter.getHeaderViewCount());
+        }
+
         recyclerView.addItemDecoration(mDecoration);
         //如果add两个，那么按照先后顺序，依次渲染。
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),
+                DividerItemDecoration.VERTICAL));
 
     }
 

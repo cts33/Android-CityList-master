@@ -14,6 +14,7 @@ import android.view.View;
 
 import com.example.city_demo_2.citylist.BaseCityAdapter;
 import com.example.city_demo_2.citylist.Header_FooterWrapperAdapter;
+import com.example.city_demo_2.citylist.ViewHolder;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 import com.example.city_demo_2.db.DBDao;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
-            protected void onBindHeaderHolder(com.example.city_demo_2.ViewHolder holder, int headerPos, int layoutId, CityBean o) {
+            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
                 holder.setText(R.id.location, o.getcName());
             }
         };

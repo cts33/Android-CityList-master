@@ -1,4 +1,4 @@
-package com.example.city_demo_2;
+package com.example.city_demo_2.citylist;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
