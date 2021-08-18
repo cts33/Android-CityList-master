@@ -1,4 +1,4 @@
-package com.example.city_demo_2;
+package com.example.city_demo_2.citylist;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.city_demo_2.R;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.flow.CommonFlowAdapter;
 import com.example.city_demo_2.flow.FlowingLayout;
@@ -112,6 +113,22 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
     @Override
     public int getItemCount() {
         return hashMap.size();
+    }
+
+    public int getPosByFirstWord(String word) {
+        Iterator<Map.Entry<String, List<CityBean>>> iterator = this.hashMap.entrySet().iterator();
+        int index=0;
+        while (iterator.hasNext()) {
+
+            Map.Entry<String, List<CityBean>> next = iterator.next();
+            if (next.getKey() == word) {
+                //返回 “A”
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

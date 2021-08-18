@@ -3,12 +3,8 @@ package com.example.city_demo_2.citylist;
 
 import android.view.ViewGroup;
 
-import androidx.collection.SparseArrayCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.example.city_demo_2.BaseCityAdapter;
 import com.example.city_demo_2.ViewHolder;
 import com.example.city_demo_2.citylist.bean.CityBean;
 
