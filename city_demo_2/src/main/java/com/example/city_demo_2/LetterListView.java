@@ -240,12 +240,15 @@ public class LetterListView extends View {
         final int oldChoose = choose;
         //计算事件在哪个字母的下标index
 //        final int currenIndex = (int) (y / getHeight() * letterList.size());
-        final int currenIndex = getCurrIndex(y);
+        int currenIndex = getCurrIndex(y);
+        if (currenIndex < 0) {
+            currenIndex = 0;
+        }
 
         switch (action) {
 
             case MotionEvent.ACTION_DOWN:
-               isClickEvent = true;
+                isClickEvent = true;
                 updateLetterByEvent(oldChoose, currenIndex);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -266,6 +269,7 @@ public class LetterListView extends View {
 
     /**
      * 通过记录的坐标集合，计算出点击是第几个位置
+     *
      * @param y
      * @return
      */
@@ -276,8 +280,9 @@ public class LetterListView extends View {
         while (iterator.hasNext()) {
             Map.Entry<String, Float> next = iterator.next();
             Float value = next.getValue();
+            Log.d(TAG, "getCurrIndex: 通过坐标，计算位置=pre "+pre +"  y "+y+" value "+value);
             if (y >= pre && y <= value) {
-                    return pos;
+                return pos;
             }
             pre = value;
             pos++;

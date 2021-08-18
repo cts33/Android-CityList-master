@@ -276,6 +276,9 @@ public class CityListLayout extends LinearLayout {
      */
     private void smoothMoveToPosition(RecyclerView mRecyclerView, final int position) {
 
+        if (position < 0)
+            return;
+
         int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
 
         int lastItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(mRecyclerView.getChildCount() - 1));
