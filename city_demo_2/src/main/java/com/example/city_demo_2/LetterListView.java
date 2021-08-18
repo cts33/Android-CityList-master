@@ -55,14 +55,16 @@ public class LetterListView extends View {
     private HashMap<String, Float> wordXY = new HashMap();
 
     //每个字母占位的高度值 px
-    private float singleHeight =50;
+    private float singleHeight = 50;
     //默认选中的第一个元素的y坐标
     private float selectY = 0;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context) {
         this(context, null);
         this.context = context;
     }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -90,7 +92,7 @@ public class LetterListView extends View {
 
         int hhh = dm.heightPixels;
 
-        Log.d(TAG, "initConfig: "+hhh);
+        Log.d(TAG, "initConfig: " + hhh);
 
         width = dp2px(context, 50);
 
@@ -103,11 +105,11 @@ public class LetterListView extends View {
                 public void onGlobalLayout() {
                     getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     height = ((View) getParent()).getHeight();
-                    Log.d(TAG, "initConfig: 测量当前view高度="+height);
+                    Log.d(TAG, "initConfig: 测量当前view高度=" + height);
 
                     float hh = height / letterList.size();
 
-                    singleHeight = Math.min(hh,singleHeight);
+                    singleHeight = Math.min(hh, singleHeight);
                     //默认选中第一个
                     selectY = singleHeight;
                     if (singleHeight > 0)
@@ -161,12 +163,23 @@ public class LetterListView extends View {
 
     }
 
+    private long lastClickTime = 0L;
+    // 两次点击间隔不能少于1000ms
+    private static final int FAST_CLICK_DELAY_TIME = 500;
+
 
     public void updateSelectIndex(String word) {
 
-        selectY = wordXY.get(word);
-        invalidate();
+        if (System.currentTimeMillis() - lastClickTime < FAST_CLICK_DELAY_TIME) {
 
+            lastClickTime = System.currentTimeMillis();
+            return;
+        }
+        if (wordXY.containsKey(word)) {
+            selectY = wordXY.get(word);
+
+            invalidate();
+        }
     }
 
     public void drawLetterList(Canvas canvas) {

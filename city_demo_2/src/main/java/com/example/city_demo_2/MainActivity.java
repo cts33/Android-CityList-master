@@ -14,6 +14,7 @@ import com.example.city_demo_2.citylist.Header_FooterWrapperAdapter;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 import com.example.city_demo_2.db.DBDao;
+import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+
+
         dbDao = new DBDao(this);
+
 
         recyclerView = (RecyclerView) findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -60,9 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
         CityBean cityBean = new CityBean();
         cityBean.setcName("北京");
-        List<CityBean> hotCitys = new ArrayList<>();
-        hotCitys.add(cityBean);
-        mHeaderAdapter.setHeaderDataAndView(R.layout.item_city, cityBean, hotCitys);
+
+        mHeaderAdapter.addHeaderView(R.layout.item_city, cityBean);
 
         recyclerView.setAdapter(mHeaderAdapter);
 
@@ -89,11 +92,36 @@ public class MainActivity extends AppCompatActivity {
                 if (!isScroll)
                     return;
 
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recy.getLayoutManager();
 
+                // TODO 获取第一个可见的首字母，便于更新字母列表
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recy.getLayoutManager();
                 int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
-                Log.d(TAG, "onScrolled: "+dy);
-//                recyclerView.scrollToPosition(firstVisibleItemPosition);
+
+                String word = mHeaderAdapter.getFirstWordByPosition(firstVisibleItemPosition);
+                Log.d(TAG, "onScrolled: first="+firstVisibleItemPosition+" word="+word);
+
+                //TODO 处理多次任务为一次任务
+                letterListView.updateSelectIndex(word);
+
+            }
+        });
+        letterListView.setOnTouchingLetterChangedListener(new LetterListView.OnTouchingLetterChangedListener() {
+            @Override
+            public void onTouchingLetterChanged(String s) {
+
+                int base=65;
+                char index = s.toCharArray()[0];
+
+                View childAt = recyclerView.getFocusedChild();
+//                int top = childAt.getTop();
+//                Log.d(TAG, "onTouchingLetterChanged: "+top);
+//                recyclerView.scrollBy(0,-top);
+//                if (index>='A'||index<='Z')
+//                    recyclerView.smoothScrollToPosition(index-base+1);
+
+//
+//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+//                layoutManager.
 
             }
         });
@@ -152,26 +180,7 @@ public class MainActivity extends AppCompatActivity {
         strings.add(0,"热门");
         letterListView.setLetters(strings);
 
-        letterListView.setOnTouchingLetterChangedListener(new LetterListView.OnTouchingLetterChangedListener() {
-            @Override
-            public void onTouchingLetterChanged(String s) {
 
-                int base=65;
-                char index = s.toCharArray()[0];
-
-                View childAt = recyclerView.getFocusedChild();
-//                int top = childAt.getTop();
-//                Log.d(TAG, "onTouchingLetterChanged: "+top);
-//                recyclerView.scrollBy(0,-top);
-//                if (index>='A'||index<='Z')
-//                    recyclerView.smoothScrollToPosition(index-base+1);
-
-//
-//                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-//                layoutManager.
-
-            }
-        });
 
     }
 

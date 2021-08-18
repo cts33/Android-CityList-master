@@ -52,11 +52,9 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public static ViewHolder get(Context context, View convertView,
-                                 ViewGroup parent, int layoutId, int position) {
+    public static ViewHolder get(Context context, View convertView,ViewGroup parent, int layoutId, int position) {
         if (convertView == null) {
-            View itemView = LayoutInflater.from(context).inflate(layoutId, parent,
-                    false);
+            View itemView = LayoutInflater.from(context).inflate(layoutId, parent, false);
             ViewHolder holder = new ViewHolder(context, itemView, parent, position);
             holder.mLayoutId = layoutId;
             return holder;

@@ -39,6 +39,22 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
         notifyDataSetChanged();
         return this;
     }
+
+    public String getFirstWordByPos(int pos) {
+        Iterator<Map.Entry<String, List<CityBean>>> iterator = this.hashMap.entrySet().iterator();
+        int index=0;
+        while (iterator.hasNext()) {
+
+            Map.Entry<String, List<CityBean>> next = iterator.next();
+            if (index == pos) {
+                //返回 “A”
+                return next.getKey();
+            }
+            index++;
+        }
+        return "";
+    }
+
 //    public BaseCityAdapter setDatas(List<CityBean> datas) {
 //        this.mDatas.clear();
 //        mDatas.addAll(datas);
@@ -64,9 +80,9 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
             if (index == position) {
                 String key = next.getKey();
                 List<CityBean> value = next.getValue();
-                Log.d(TAG, "onBindViewHolder: "+key+"---"+value.size());
+                Log.d(TAG, "onBindViewHolder: " + key + "---" + value.size());
 //
-                holder.flowingLayout.setAdapter(new CommonFlowAdapter<CityBean>(mContext,value) {
+                holder.flowingLayout.setAdapter(new CommonFlowAdapter<CityBean>(mContext, value) {
                     @Override
                     public void convert(FlowHolder holder, CityBean item, int position) {
                         holder.setText(item.getcName());
@@ -81,7 +97,7 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
                 holder.flowingLayout.setOnItemClick(new FlowingLayout.OnItemTagListener<CityBean>() {
                     @Override
                     public void selectItem(CityBean o) {
-                        Toast.makeText(mContext, ""+o.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "" + o.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
