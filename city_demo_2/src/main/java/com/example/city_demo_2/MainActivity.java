@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mTitleHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics());
 
 
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onBindHeaderHolder(com.example.city_demo_2.ViewHolder holder, int headerPos, int layoutId, CityBean o) {
                 holder.setText(R.id.location, o.getcName());
-//                holder.setImageResource(R.id.ivAvatar,R.drawable.friend);
             }
         };
 
