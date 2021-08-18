@@ -2,6 +2,7 @@ package com.example.city_demo_2;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,13 +13,17 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 
 
+import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,38 +47,51 @@ public class LetterListView extends View {
 
     private Context context;
     private int textSize = 15;
-    private int width, height;
+    private float width, height;
 
     private int textDefaultColor = Color.parseColor("#333333");
     private int textFocusColor = Color.RED;
 
-    private HashMap<String, Integer> wordXY = new HashMap();
+    private HashMap<String, Float> wordXY = new HashMap();
 
     //每个字母占位的高度值 px
-    private int singleHeight;
+    private float singleHeight =50;
     //默认选中的第一个元素的y坐标
-    private int selectY = 0;
-
+    private float selectY = 0;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context) {
         this(context, null);
         this.context = context;
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
         this.context = context;
 
     }
 
-    public LetterListView(Context context,  AttributeSet attrs,  int defStyle) {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public LetterListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         this.context = context;
+
+        setBackgroundColor(Color.GRAY);
         initConfig();
+
     }
 
 
     private void initConfig() {
+
+        Resources resources = this.getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+
+
+        int hhh = dm.heightPixels;
+
+        Log.d(TAG, "initConfig: "+hhh);
+
         width = dp2px(context, 50);
 
         letterList.addAll(Arrays.asList(defaultLets));
@@ -85,8 +103,11 @@ public class LetterListView extends View {
                 public void onGlobalLayout() {
                     getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     height = ((View) getParent()).getHeight();
+                    Log.d(TAG, "initConfig: 测量当前view高度="+height);
 
-                    singleHeight = height / letterList.size();
+                    float hh = height / letterList.size();
+
+                    singleHeight = Math.min(hh,singleHeight);
                     //默认选中第一个
                     selectY = singleHeight;
                     if (singleHeight > 0)
@@ -126,7 +147,7 @@ public class LetterListView extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 
-        setMeasuredDimension(width, getMeasuredHeight());
+        setMeasuredDimension((int) width, getMeasuredHeight());
     }
 
     private static final String TAG = "LetterListView";
@@ -159,7 +180,7 @@ public class LetterListView extends View {
         for (int i = 0; i < letSize; i++) {
 
             word = letterList.get(i);
-            int bottom = top + singleHeight;
+            float bottom = top + singleHeight;
             RectF rect = new RectF(0, top, width, bottom);//画一个矩形
 
             wordXY.put(word, bottom);
@@ -167,16 +188,7 @@ public class LetterListView extends View {
 
             Paint mPaint = new Paint();
 
-//            canvas.drawRect(rect, mPaint);
-
-            //设置画笔的样式，空心STROKE
-//            mPaint.setStyle(Paint.Style.FILL);
-            //设置抗锯齿
-//            mPaint.setAntiAlias(true);
-
             top += singleHeight;
-//            canvas.drawCircle(rect.centerX(), rect.centerY(), singleHeight / 2, mPaint);
-
             mPaint.setColor(Color.BLACK);
             mPaint.setTextSize(22);
 
@@ -184,18 +196,19 @@ public class LetterListView extends View {
             //该方法即为设置基线上那个点究竟是left,center,还是right  这里我设置为center
             mPaint.setTextAlign(Paint.Align.CENTER);
 
-            Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
-            float t = fontMetrics.top;//为基线到字体上边框的距离,即上图中的top
-            float b = fontMetrics.bottom;//为基线到字体下边框的距离,即上图中的bottom
+//            Paint.FontMetrics fontMetrics = mPaint.getFontMetrics();
+//            float t = fontMetrics.top;//为基线到字体上边框的距离,即上图中的top
+//            float b = fontMetrics.bottom;//为基线到字体下边框的距离,即上图中的bottom
 
-            int baseLineY = (int) (rect.centerY() - t / 2 - b / 2);//基线中间点的y轴计算公式
+//            int baseLineY = (int) (rect.centerY() - t / 2 - b / 2);//基线中间点的y轴计算公式
 
+//            Log.d(TAG, "drawLetterList: "+baseLineY);
             if (selectY == bottom) {
                 mPaint.setColor(Color.RED);
 
             }
 
-            canvas.drawText(word, rect.centerX(), baseLineY, mPaint);
+            canvas.drawText(word, rect.centerX(), bottom, mPaint);
         }
 
     }
