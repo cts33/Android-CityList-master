@@ -33,6 +33,12 @@ public class MainActivity2 extends AppCompatActivity {
         List<CityBean> sss = new ArrayList<>();
         sss.addAll(allList.subList(10, 20));
 
+
+        CityBean cityBean = new CityBean();
+        cityBean.setcName("北京");
+
+
+        mCitylistlayout.addCurrLocation(cityBean,R.layout.item_city);
         mCitylistlayout.addCitySpecialData("热门", sss);
         mCitylistlayout.addCityList(allList);
     }

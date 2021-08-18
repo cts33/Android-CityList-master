@@ -183,7 +183,7 @@ public class CityListLayout extends LinearLayout {
 
     public static final String SPECIAL_TYPE = "0";
 
-    public void addCurrCity(CityBean currCityBean, @LayoutRes int layoutid) {
+    public void addCurrLocation(CityBean currCityBean, @LayoutRes int layoutid) {
 
         if (mAdapter == null) {
             return;
@@ -197,6 +197,7 @@ public class CityListLayout extends LinearLayout {
 
         mHeaderAdapter.addHeaderView(layoutid, currCityBean);
 
+        recyclerView.setAdapter(mHeaderAdapter);
 
     }
 
