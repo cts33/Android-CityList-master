@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTitleHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics());
 
 
         dbDao = new DBDao(this);
@@ -186,25 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         Collections.sort(allList);
 
-        hashMap = new LinkedHashMap<>();
-        List<CityBean> subArray = null;
-        String currLetter = "";
-        for (int i = 0; i < allList.size(); i++) {
 
-            CityBean cc = allList.get(i);
-            String pp = cc.getFirstWord();
-
-
-            //上次字母和本次不一样，证明新数据
-            if (!currLetter.equals(pp)) {
-                currLetter = pp;
-                subArray = new ArrayList<>();
-                subArray.add(cc);
-                hashMap.put(pp, subArray);
-            } else {
-                subArray.add(cc);
-            }
-        }
 
 
         mAdapter.setDataMap(hashMap);

@@ -121,7 +121,7 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
         while (iterator.hasNext()) {
 
             Map.Entry<String, List<CityBean>> next = iterator.next();
-            if (next.getKey() == word) {
+            if (next.getKey() .equals( word)) {
                 //返回 “A”
                 return index;
             }
