@@ -191,14 +191,32 @@ public class CityListLayout extends LinearLayout {
         }
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
-            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
-                holder.setText(R.id.location, o.getcName());
+            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean cityBean) {
+                holder.setText(R.id.location, cityBean.getcName());
+                holder.getView(R.id.location).setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (itemClickListener!=null){
+                            itemClickListener.headerViewClick(cityBean);
+                        }
+                    }
+                });
             }
         };
 
         mHeaderAdapter.addHeaderView(layoutid, currCityBean);
 
 
+    }
+    private ItemClickListener itemClickListener;
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
+
+    public interface ItemClickListener{
+        void headerViewClick(CityBean cityBean);
+        void flowItemClick(CityBean cityBean);
     }
 
 
@@ -270,6 +288,15 @@ public class CityListLayout extends LinearLayout {
         } else {
             recyclerView.setAdapter(mHeaderAdapter);
         }
+
+        mAdapter.setiFlowingItemClickListener(new BaseCityAdapter.IFlowingItemClickListener() {
+            @Override
+            public void clickItem(CityBean cityBean) {
+                if (itemClickListener!=null){
+                    itemClickListener.flowItemClick(cityBean);
+                }
+            }
+        });
 
     }
 

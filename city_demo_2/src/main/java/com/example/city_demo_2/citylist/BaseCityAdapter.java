@@ -56,12 +56,6 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
         return "";
     }
 
-//    public BaseCityAdapter setDatas(List<CityBean> datas) {
-//        this.mDatas.clear();
-//        mDatas.addAll(datas);
-//        return this;
-//    }
-
     @Override
     public BaseCityAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View inflate = mInflater.inflate(R.layout.recycler_item, parent, false);
@@ -82,7 +76,7 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
                 String key = next.getKey();
                 List<CityBean> value = next.getValue();
                 Log.d(TAG, "onBindViewHolder: " + key + "---" + value.size());
-//
+
                 holder.flowingLayout.setAdapter(new CommonFlowAdapter<CityBean>(mContext, value) {
                     @Override
                     public void convert(FlowHolder holder, CityBean item, int position) {
@@ -97,8 +91,10 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
 
                 holder.flowingLayout.setOnItemClick(new FlowingLayout.OnItemTagListener<CityBean>() {
                     @Override
-                    public void selectItem(CityBean o) {
-                        Toast.makeText(mContext, "" + o.toString(), Toast.LENGTH_SHORT).show();
+                    public void selectItem(CityBean cityBean) {
+                        Toast.makeText(mContext, "" + cityBean.toString(), Toast.LENGTH_SHORT).show();
+                        if (iFlowingItemClickListener!=null)
+                            iFlowingItemClickListener.clickItem(cityBean);
                     }
                 });
 
@@ -106,7 +102,7 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
             }
             index++;
         }
-//        holder.avatar.setImageResource(R.drawable.);
+
     }
 
 
@@ -134,11 +130,21 @@ public class BaseCityAdapter extends RecyclerView.Adapter<BaseCityAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder {
         FlowingLayout flowingLayout;
 
-
         public ViewHolder(View itemView) {
             super(itemView);
             flowingLayout = (FlowingLayout) itemView.findViewById(R.id.flowingLayout);
 
         }
+    }
+
+    private IFlowingItemClickListener iFlowingItemClickListener;
+
+    public void setiFlowingItemClickListener(IFlowingItemClickListener iFlowingItemClickListener) {
+        this.iFlowingItemClickListener = iFlowingItemClickListener;
+    }
+
+    public interface IFlowingItemClickListener{
+
+        void clickItem(CityBean cityBean);
     }
 }

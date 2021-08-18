@@ -1,6 +1,7 @@
 package com.example.city_demo_2;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -45,6 +46,17 @@ public class MainActivity2 extends AppCompatActivity {
 
     private void initViews() {
         mCitylistlayout = findViewById(R.id.cityListLayout);
+        mCitylistlayout.setItemClickListener(new CityListLayout.ItemClickListener() {
+            @Override
+            public void headerViewClick(CityBean cityBean) {
+                Toast.makeText(MainActivity2.this, ""+cityBean.toString(), Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void flowItemClick(CityBean cityBean) {
+
+                Toast.makeText(MainActivity2.this, ""+cityBean.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
