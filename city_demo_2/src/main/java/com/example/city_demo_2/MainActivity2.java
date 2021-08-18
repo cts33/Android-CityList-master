@@ -8,6 +8,7 @@ import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.db.DBDao;
 import com.example.city_demo_2.view.CityListLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity2 extends AppCompatActivity {
@@ -28,6 +29,11 @@ public class MainActivity2 extends AppCompatActivity {
 
         List<CityBean> allList = dbDao.getAllList();
 
+
+        List<CityBean> sss = new ArrayList<>();
+        sss.addAll(allList.subList(10, 20));
+
+        mCitylistlayout.addCitySpecialData("热门", sss);
         mCitylistlayout.addCityList(allList);
     }
 

@@ -98,8 +98,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
-                    .getLayoutParams();
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child .getLayoutParams();
             int position = params.getViewLayoutPosition();
             position -= getHeaderViewCount();
             //pos为1，size为1，1>0? true
@@ -154,6 +153,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
             Map.Entry<String, List<CityBean>> next = iterator.next();
             if (index == pos) {
                 String key = next.getKey();
+                key = key.equals("0") ?"热门":key;
                 return key != null ? key : "";
             }
             index++;

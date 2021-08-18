@@ -203,12 +203,14 @@ public class CityListLayout extends LinearLayout {
 
     /**
      * key  代表特殊类型，如：热门城市，历史
+     * 0--热门
+     *
      *
      * @param specialBeanListList
      */
     public void addCitySpecialData(String key, List<CityBean> specialBeanListList) {
 
-        //0 小于字母的值，所以会排序到前面
+        //0小于字母的值，所以会排序到前面
         hashMap.put(SPECIAL_TYPE, specialBeanListList);
     }
 
