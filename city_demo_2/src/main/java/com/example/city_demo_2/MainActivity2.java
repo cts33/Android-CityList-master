@@ -20,12 +20,12 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
         initViews();
 
-        initData();
     }
 
-    private void initData() {
+    private void initViews() {
         DBDao dbDao = new DBDao(this);
 
         List<CityBean> allList = dbDao.getAllList();
@@ -39,13 +39,11 @@ public class MainActivity2 extends AppCompatActivity {
         cityBean.setcName("北京");
 
 
+        mCitylistlayout = findViewById(R.id.cityListLayout);
+
         mCitylistlayout.addCurrLocation(cityBean,R.layout.item_city);
         mCitylistlayout.addCitySpecialData("热门", sss);
         mCitylistlayout.addCityList(allList);
-    }
-
-    private void initViews() {
-        mCitylistlayout = findViewById(R.id.cityListLayout);
         mCitylistlayout.setItemClickListener(new CityListLayout.ItemClickListener() {
             @Override
             public void headerViewClick(CityBean cityBean) {

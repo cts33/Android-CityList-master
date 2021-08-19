@@ -13,9 +13,7 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by next on 2016/3/24.
- */
+
 public class PingYinUtil {
     /**
      * 将字符串中的中文转化为拼音,其他字符不变

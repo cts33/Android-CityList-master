@@ -1,4 +1,4 @@
-package com.example.city_demo_2;
+package com.example.city_demo_2.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;

@@ -9,7 +9,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.LayoutRes;
@@ -19,8 +18,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.city_demo_2.LetterListView;
-import com.example.city_demo_2.MainActivity;
 import com.example.city_demo_2.PingYinUtil;
 import com.example.city_demo_2.R;
 import com.example.city_demo_2.citylist.BaseCityAdapter;
@@ -31,9 +28,10 @@ import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CityListLayout extends LinearLayout {
 
@@ -264,8 +262,22 @@ public class CityListLayout extends LinearLayout {
             }
         }
 
+        setData2LetterListview();
 
         setData2ViewLayout();
+    }
+
+    private void setData2LetterListview() {
+
+        List<String> subArray = new ArrayList<>();
+        Iterator<Map.Entry<String, List<CityBean>>> iterator = hashMap.entrySet().iterator();
+
+        while (iterator.hasNext()){
+            String key = iterator.next().getKey();
+            key = key.equals("0") ? "热门":key;
+            subArray.add(key);
+        }
+        letterListView.setLetters(subArray);
     }
 
     /**
@@ -309,10 +321,15 @@ public class CityListLayout extends LinearLayout {
 
         if (position < 0)
             return;
+        //第一个可见的view
+        View firstVisibleView = mRecyclerView.getChildAt(0);
+        //第一个可见的条目
+        int firstItem = mRecyclerView.getChildLayoutPosition(firstVisibleView);
 
-        int firstItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(0));
-
-        int lastItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt(mRecyclerView.getChildCount() - 1));
+        //可见的总条目数量
+        int visibleItemCount = mRecyclerView.getChildCount();
+        //最后一个可见的条目
+        int lastItem = mRecyclerView.getChildLayoutPosition(mRecyclerView.getChildAt( visibleItemCount- 1));
         Log.d(TAG, "smoothMoveToPosition: " + position);
         if (position < firstItem) {
             mRecyclerView.smoothScrollToPosition(position);

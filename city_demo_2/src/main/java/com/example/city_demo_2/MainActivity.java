@@ -1,6 +1,5 @@
 package com.example.city_demo_2;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -8,9 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.MotionEvent;
-import android.view.View;
 
 import com.example.city_demo_2.citylist.BaseCityAdapter;
 import com.example.city_demo_2.citylist.Header_FooterWrapperAdapter;
@@ -18,12 +14,11 @@ import com.example.city_demo_2.citylist.ViewHolder;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 import com.example.city_demo_2.db.DBDao;
+import com.example.city_demo_2.view.LetterListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TreeSet;
 
