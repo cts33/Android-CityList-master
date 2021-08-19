@@ -6,24 +6,31 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 
 import androidx.annotation.RequiresApi;
+
+import com.example.city_demo_2.PingYinUtil;
+import com.example.city_demo_2.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +39,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -62,6 +70,10 @@ public class LetterListView extends View {
     //默认选中的第一个元素的y坐标
     private float selectY = 0;
     private boolean isClickEvent;
+    private OverlayThread overlayThread;
+    private boolean isOverlayReady =false;
+    private TextView letterOverlay;
+    private Handler handler;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public LetterListView(Context context) {
@@ -84,7 +96,37 @@ public class LetterListView extends View {
 
         setBackgroundColor(Color.GRAY);
         initConfig();
+        initOverlay();
 
+    }
+    private class OverlayThread implements Runnable {
+        @Override
+        public void run() {
+            letterOverlay.setVisibility(View.GONE);
+        }
+    }
+    // 初始化汉语拼音首字母弹出提示框
+    private void initOverlay() {
+        handler = new Handler();
+        overlayThread = new OverlayThread();
+        isOverlayReady = true;
+
+        letterOverlay = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.v_letter_overlay, null);
+        letterOverlay.setVisibility(View.INVISIBLE);
+
+        int width = dp2px(  65);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                width, width,
+                WindowManager.LayoutParams.TYPE_APPLICATION,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT);
+        WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        windowManager.addView(letterOverlay, lp);
+    }
+   private int dp2px(float dp) {
+        return (int) (getResources().getDisplayMetrics().density * dp);
     }
 
 
@@ -173,6 +215,8 @@ public class LetterListView extends View {
 
 
     public void updateSelectIndex(String word) {
+        visibleOverLay(word);
+
         //如果是滑动事件，不处理
         if (isClickEvent)
             return;
@@ -252,6 +296,7 @@ public class LetterListView extends View {
                 updateLetterByEvent(oldChoose, currenIndex);
                 break;
             case MotionEvent.ACTION_MOVE:
+                isOverlayReady = true;
                 updateLetterByEvent(oldChoose, currenIndex);
                 invalidate();
                 break;
@@ -262,6 +307,7 @@ public class LetterListView extends View {
                 selectY = wordXY.get(w);
                 invalidate();
                 isClickEvent = false;
+                isOverlayReady = false;
                 break;
         }
         return true;
@@ -301,7 +347,27 @@ public class LetterListView extends View {
                 //根据字母取出坐标
                 selectY = wordXY.get(w);
 
+
+                handler.removeCallbacks(overlayThread);
+                handler.postDelayed(overlayThread,1000);
             }
+        }
+    }
+
+    public void visibleOverLay(String firstword){
+        if (isOverlayReady) {
+
+            Pattern pattern = Pattern.compile("[A-Z]");
+            if (pattern.matcher(firstword).matches()) {
+                letterOverlay.setTextSize(40);
+            } else {
+                letterOverlay.setTextSize(20);
+            }
+            letterOverlay.setText(firstword);
+            letterOverlay.setVisibility(View.VISIBLE);
+            handler.removeCallbacks(overlayThread);
+            // 延迟一秒后执行，让overlay为不可见
+            handler.postDelayed(overlayThread, 1000);
         }
     }
 
