@@ -2,3 +2,4 @@
 //include ':city_demo'
 
 include ':city_demo_2'
+include ':NoBoLoadingLayout'
