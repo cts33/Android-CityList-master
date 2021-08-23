@@ -1,4 +1,4 @@
-package com.example.city_demo_2;
+package com.example.city_demo_2.loading;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,10 +17,13 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.city_demo_2.R;
 import com.example.noboloadinglayout.LoadingView;
 import com.example.noboloadinglayout.NoBoLoadingManager;
 
 import java.util.Locale;
+
+import static com.example.city_demo_2.loading.Utils.getRandomImage;
 
 public class MainFragment extends Fragment {
 
@@ -29,48 +32,43 @@ public class MainFragment extends Fragment {
     private NoBoLoadingManager noBoLoadingManager;
 
     @Nullable
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, null);
-        mImage = root.findViewById(R.id.image);
-        noBoLoadingManager = NoBoLoadingManager.wrapView(mImage);
 
+        noBoLoadingManager = NoBoLoadingManager.wrapFragment(this, root);
+
+        mImage = root.findViewById(R.id.image);
         initViews();
-        return noBoLoadingManager.getWrapper();
+        return NoBoLoadingManager.getWrapper();
     }
 
     private static final String TAG = "MainFragment";
 
     private void initViews() {
 
-        noBoLoadingManager.showLoading();
-
         String randomImage = getRandomImage();
 
-        Log.d(TAG, "initViews:  开始执行任务"+randomImage);
+        noBoLoadingManager.showLoading();
+        Log.d(TAG, "initViews:  开始执行任务" + randomImage);
         Glide.with(this)
                 .load(randomImage)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
+                        noBoLoadingManager.showLoadFailed();
+
                         Log.d(TAG, "onLoadFailed: ");
-                        noBoLoadingManager   .showLoadFailed()
-                                .showRetry(new LoadingView.IRetryClickListener() {
-                                    @Override
-                                    public void retryClick() {
-                                        initViews();
-                                    }
-                                });
+
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         Log.d(TAG, "onResourceReady: ");
-                        noBoLoadingManager.showLoadSuccess();
 
+                        noBoLoadingManager.showLoadSuccess();
 
                         return false;
                     }
@@ -78,9 +76,4 @@ public class MainFragment extends Fragment {
                 .into(mImage);
     }
 
-    public static String getRandomImage() {
-//        int id = (int) (Math.random() * 100000);
-        int id = -1;
-        return String.format(Locale.CHINA, "https://www.thiswaifudoesnotexist.net/example-%d.jpg", id);
-    }
 }
