@@ -28,7 +28,6 @@ public class NoBoLoadingManager {
 
     private NoBoLoadingManager(Context context) {
         this.context = context;
-
     }
 
 
@@ -96,16 +95,17 @@ public class NoBoLoadingManager {
         ViewGroup.LayoutParams layoutParams = rootView.getLayoutParams();
 
         if (layoutParams != null) {
-
-            FrameLayout.LayoutParams lay = new FrameLayout.LayoutParams(layoutParams.width,layoutParams.height);
-            wrapper.setLayoutParams(lay);
+            wrapper.setLayoutParams(layoutParams);
         }
 
-        ViewGroup parent;
-        if ((parent = (ViewGroup) rootView.getParent()) != null) {
+        if (rootView.getParent() != null) {
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            int index = parent.indexOfChild(rootView);
             parent.removeView(rootView);
+            parent.addView(wrapper, index);
         }
-        wrapper.addView(rootView);
+        FrameLayout.LayoutParams newLp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        wrapper.addView(rootView, newLp);
         return noBoLoadingManager;
 
     }
