@@ -72,43 +72,22 @@ public class NoBoLoadingManager {
     }
 
     public void loading()  {
+        innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOADING);
 
-
-        innerView.setStatus(NormalLoadingView.STATUS_LOADING);
-//        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-//
-//        try {
-//            int index = 0;
-//            for (StackTraceElement e : stackTrace) {
-//    //            if (e.getClassName().equals(Activity.class.getName())) {
-//                Class<?> aClass = Class.forName(e.getClassName());
-//
-//                Log.d(TAG, index + "-----" + aClass+ "   \t" + e.getMethodName());
-//                index++;
-//    //            }
-//            }
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
     }
     public void showLoadFailed( ) {
         showLoadFailed(null);
     }
 
 
-    public void showLoadFailed(IRetryClickListener iRetryClickListener) {
-        innerView.setStatus(NormalLoadingView.STATUS_LOAD_FAILED);
-        innerView.setiRetryClickListener(iRetryClickListener);
+    public void showLoadFailed(ILoadingView.IRetryClickListener iRetryClickListener) {
+        innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOAD_FAILED);
+        innerView.setIRetryClickListener(iRetryClickListener);
     }
 
     public void showLoadSuccess() {
 
-        innerView.setStatus(NormalLoadingView.STATUS_LOAD_SUCCESS);
-    }
-
-    public static class Builder {
-
-
+        innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOAD_SUCCESS);
     }
 
 

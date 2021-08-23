@@ -1,8 +1,17 @@
 package com.example.noboloadinglayout;
 
-public interface ILoadingView {
-    void loading();
-    void success();
-    void failed();
-    void retry();
+import android.view.View;
+
+public interface ILoadingView  extends View.OnClickListener{
+    interface IRetryClickListener {
+        void retryClick();
+    }
+
+    void setVisibleByStatus(int status);
+
+    void setIRetryClickListener(IRetryClickListener iRetryClickListener);
+
+
+
 }
+

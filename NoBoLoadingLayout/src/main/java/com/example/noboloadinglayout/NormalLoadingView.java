@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class NormalLoadingView extends LinearLayout  implements View.OnClickListener{
+public class NormalLoadingView extends LinearLayout implements ILoadingView{
 
     private LayoutInflater inflater;
     private Context context;
@@ -37,15 +37,26 @@ public class NormalLoadingView extends LinearLayout  implements View.OnClickList
         mImage = findViewById(R.id.image);
         mDes = findViewById(R.id.text);
         setBackgroundColor(getResources().getColor(R.color.main_bg_1));
-//        this.mRetryTask = retryTask;
 
     }
 
-    public void setiRetryClickListener(IRetryClickListener iRetryClickListener) {
+    public void setIRetryClickListener(IRetryClickListener iRetryClickListener) {
         this.iRetryClickListener = iRetryClickListener;
     }
 
-    public void setStatus(int status) {
+
+
+    @Override
+    public void onClick(View view) {
+        if (iRetryClickListener!=null){
+            iRetryClickListener.retryClick();
+            iRetryClickListener =null;
+        }
+    }
+
+
+    @Override
+    public void setVisibleByStatus(int status) {
         boolean show = true;
         View.OnClickListener onClickListener = null;
         int image = R.drawable.loading;
@@ -70,33 +81,4 @@ public class NormalLoadingView extends LinearLayout  implements View.OnClickList
         mDes.setText(str);
         setVisibility(show ? View.VISIBLE : View.GONE);
     }
-
-    @Override
-    public void onClick(View view) {
-        if (iRetryClickListener!=null){
-            iRetryClickListener.retryClick();
-            iRetryClickListener =null;
-        }
-    }
-
-
-//    @Override
-//    public void loading() {
-//
-//    }
-//
-//    @Override
-//    public void success() {
-//
-//    }
-//
-//    @Override
-//    public void failed() {
-//
-//    }
-//
-//    @Override
-//    public void retry() {
-//
-//    }
 }
