@@ -6,11 +6,11 @@
     android:layout_height="match_parent">
 
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/image"
-        />
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment"
+        android:name="com.example.city_demo_2.MainFragment"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

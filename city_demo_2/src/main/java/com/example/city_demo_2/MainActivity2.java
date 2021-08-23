@@ -41,19 +41,19 @@ public class MainActivity2 extends AppCompatActivity {
 
         mCitylistlayout = findViewById(R.id.cityListLayout);
 
-        mCitylistlayout.addCurrLocation(cityBean,R.layout.item_city);
+        mCitylistlayout.addCurrLocation(cityBean, R.layout.item_city);
         mCitylistlayout.addCitySpecialData("热门", sss);
         mCitylistlayout.addCityList(allList);
         mCitylistlayout.setItemClickListener(new CityListLayout.ItemClickListener() {
             @Override
             public void headerViewClick(CityBean cityBean) {
-                Toast.makeText(MainActivity2.this, ""+cityBean.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity2.this, "" + cityBean.toString(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void flowItemClick(CityBean cityBean) {
 
-                Toast.makeText(MainActivity2.this, ""+cityBean.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity2.this, "" + cityBean.toString(), Toast.LENGTH_SHORT).show();
             }
         });
     }

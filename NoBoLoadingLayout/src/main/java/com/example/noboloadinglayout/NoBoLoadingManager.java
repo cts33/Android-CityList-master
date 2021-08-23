@@ -9,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.FrameLayout;
 
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 public class NoBoLoadingManager {
@@ -55,8 +57,65 @@ public class NoBoLoadingManager {
         return noBoLoadingManager;
     }
 
-    public void wrapFragment() {
+    private static boolean isLoaded = false;
 
+    public static NoBoLoadingManager wrapFragment(Fragment fragment, View fragmentView) {
+        getInstance(fragment.getContext());
+
+        //如果已经加载过loading，不用再次加载
+        if (isLoaded) {
+            return noBoLoadingManager;
+        }
+        isLoaded = true;
+
+        wrapper = new FrameLayout(fragment.getContext());
+        ViewGroup.LayoutParams layoutParams = fragmentView.getLayoutParams();
+
+        if (layoutParams != null) {
+
+            FrameLayout.LayoutParams lay = new FrameLayout.LayoutParams(layoutParams.width,layoutParams.height);
+            wrapper.setLayoutParams(lay);
+        }
+
+        ViewGroup parent;
+        if ((parent = (ViewGroup) fragmentView.getParent()) != null) {
+            parent.removeView(fragmentView);
+        }
+        wrapper.addView(fragmentView);
+        return noBoLoadingManager;
+
+    }
+
+    public static ViewGroup getWrapper() {
+
+        ViewGroup parent;
+        if ((parent = (ViewGroup) wrapper.getParent()) != null) {
+            parent.removeView(wrapper);
+        }
+
+        return wrapper;
+    }
+
+    private void initView() {
+        // 复用view
+        LoadingView currView = (LoadingView) statusView.get(LoadingView.STATUS_LOADING);
+        if (currView == null) {
+            currView = (LoadingView) statusView.get(LoadingView.STATUS_LOAD_FAILED);
+        }
+        if (currView == null) {
+            innerView = new NormalLoadingView(context);
+            statusView.put(LoadingView.STATUS_LOADING, innerView);
+//            preStatus = LoadingView.STATUS_LOADING;
+            wrapper.addView(innerView);
+        } else {
+            ViewGroup parent;
+            if ((parent = (ViewGroup) currView.getParent()) != null) {
+                parent.removeView(currView);
+            }
+            innerView = currView;
+            wrapper.addView(innerView);
+            innerView.bringToFront();
+        }
     }
 
     public void wrapView() {
@@ -76,24 +135,7 @@ public class NoBoLoadingManager {
 
         if (inputView == null) {
 
-            // 复用view
-            LoadingView currView = (LoadingView) statusView.get(LoadingView.STATUS_LOADING);
-            if (currView == null) {
-                currView = (LoadingView) statusView.get(LoadingView.STATUS_LOAD_FAILED);
-            }
-            if (currView == null) {
-                innerView = new NormalLoadingView(context);
-                statusView.put(LoadingView.STATUS_LOADING, innerView);
-                wrapper.addView(innerView);
-            } else {
-                ViewGroup parent;
-                if ((parent= (ViewGroup) currView.getParent())!=null) {
-                    parent.removeView(currView);
-                }
-                innerView = currView;
-                wrapper.addView(innerView);
-                innerView.bringToFront();
-            }
+            initView();
         } else {
             innerView = inputView;
         }
@@ -113,6 +155,7 @@ public class NoBoLoadingManager {
     public void showRetry(LoadingView.IRetryClickListener iRetryClickListener) {
         checkNotNull();
         statusView.put(LoadingView.STATUS_LOAD_FAILED, innerView);
+//        preStatus = LoadingView.STATUS_LOAD_FAILED;
         innerView.setIRetryClickListener(iRetryClickListener);
 
     }
@@ -132,6 +175,7 @@ public class NoBoLoadingManager {
     public void showLoadSuccess(String msg) {
         checkNotNull();
         statusView.put(LoadingView.STATUS_LOAD_SUCCESS, innerView);
+//        preStatus = LoadingView.STATUS_LOAD_SUCCESS;
         innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOAD_SUCCESS);
     }
 
