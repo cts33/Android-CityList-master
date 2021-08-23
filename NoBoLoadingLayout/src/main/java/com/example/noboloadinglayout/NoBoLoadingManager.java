@@ -87,6 +87,8 @@ public class NoBoLoadingManager {
     }
 
     public static NoBoLoadingManager wrapView( View rootView) {
+        if (rootView==null)
+            throw new NullPointerException("rootview is null");
         getInstance(rootView.getContext());
 
         //如果已经加载过loading，不用再次加载
