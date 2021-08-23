@@ -23,9 +23,12 @@ public class NoBoLoadingManager {
     private Context context;
     private static ViewGroup wrapper;
 
+    private LoadingView innerView;
+    private SparseArray<View> statusView = new SparseArray<>(4);
+
     private NoBoLoadingManager(Context context) {
         this.context = context;
-        initConfig(context);
+
     }
 
 
@@ -37,14 +40,6 @@ public class NoBoLoadingManager {
             }
         }
         return noBoLoadingManager;
-    }
-
-    private LoadingView innerView;
-
-    private void initConfig(Context context) {
-
-        // TODO 创建默认view 对象  各种状态
-
     }
 
 
@@ -146,15 +141,10 @@ public class NoBoLoadingManager {
         }
     }
 
-    public void wrapView() {
-
-    }
-
     public void showLoading() {
         showLoading(null);
     }
 
-    private SparseArray<View> statusView = new SparseArray<>(4);
 
     /**
      * 执行loading
