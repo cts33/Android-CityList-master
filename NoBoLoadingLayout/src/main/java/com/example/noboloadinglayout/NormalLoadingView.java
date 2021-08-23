@@ -2,6 +2,7 @@ package com.example.noboloadinglayout;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,24 +10,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class NormalLoadingView extends LinearLayout implements ILoadingView{
+public class NormalLoadingView extends  LoadingView{
 
     private LayoutInflater inflater;
     private Context context;
     private ImageView mImage;
     private IRetryClickListener iRetryClickListener;
 
-    public NormalLoadingView(Context context ) {
-        super(context);
 
-        initView();
-    }
 
     private TextView mDes;
-    public static final int STATUS_LOADING = 1;
-    public static final int STATUS_LOAD_SUCCESS = 2;
-    public static final int STATUS_LOAD_FAILED = 3;
-    public static final int STATUS_EMPTY_DATA = 4;
+
+    public NormalLoadingView(Context context) {
+        super(context);
+        initView();
+    }
 
     private void initView() {
         context = getContext();
@@ -54,9 +52,10 @@ public class NormalLoadingView extends LinearLayout implements ILoadingView{
         }
     }
 
-
+    private static final String TAG = "NormalLoadingView";
     @Override
     public void setVisibleByStatus(int status) {
+        Log.d(TAG, "setVisibleByStatus: "+status);
         boolean show = true;
         View.OnClickListener onClickListener = null;
         int image = R.drawable.loading;
