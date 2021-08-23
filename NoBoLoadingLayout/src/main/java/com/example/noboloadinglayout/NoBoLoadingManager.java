@@ -86,13 +86,39 @@ public class NoBoLoadingManager {
 
     }
 
+    public static NoBoLoadingManager wrapView( View rootView) {
+        getInstance(rootView.getContext());
+
+        //如果已经加载过loading，不用再次加载
+        if (isLoaded) {
+            return noBoLoadingManager;
+        }
+        isLoaded = true;
+
+        wrapper = new FrameLayout(rootView.getContext());
+        ViewGroup.LayoutParams layoutParams = rootView.getLayoutParams();
+
+        if (layoutParams != null) {
+
+            FrameLayout.LayoutParams lay = new FrameLayout.LayoutParams(layoutParams.width,layoutParams.height);
+            wrapper.setLayoutParams(lay);
+        }
+
+        ViewGroup parent;
+        if ((parent = (ViewGroup) rootView.getParent()) != null) {
+            parent.removeView(rootView);
+        }
+        wrapper.addView(rootView);
+        return noBoLoadingManager;
+
+    }
+
     public static ViewGroup getWrapper() {
 
         ViewGroup parent;
         if ((parent = (ViewGroup) wrapper.getParent()) != null) {
             parent.removeView(wrapper);
         }
-
         return wrapper;
     }
 
@@ -177,6 +203,13 @@ public class NoBoLoadingManager {
         statusView.put(LoadingView.STATUS_LOAD_SUCCESS, innerView);
 //        preStatus = LoadingView.STATUS_LOAD_SUCCESS;
         innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOAD_SUCCESS);
+        reset();
+    }
+
+    private void reset() {
+        statusView.clear();
+        isLoaded = false;
+        innerView = null;
     }
 
     private void checkNotNull() {
