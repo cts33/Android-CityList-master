@@ -33,24 +33,29 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, null);
-        noBoLoadingManager = NoBoLoadingManager.wrapFragment(this, root);
+        mImage = root.findViewById(R.id.image);
+        noBoLoadingManager = NoBoLoadingManager.wrapView(mImage);
+
         initViews();
         return noBoLoadingManager.getWrapper();
     }
 
+    private static final String TAG = "MainFragment";
 
     private void initViews() {
-        mImage = root.findViewById(R.id.image);
-
 
         noBoLoadingManager.showLoading();
 
+        String randomImage = getRandomImage();
 
+        Log.d(TAG, "initViews:  开始执行任务"+randomImage);
         Glide.with(this)
-                .load(getRandomImage())
+                .load(randomImage)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+
+                        Log.d(TAG, "onLoadFailed: ");
                         noBoLoadingManager   .showLoadFailed()
                                 .showRetry(new LoadingView.IRetryClickListener() {
                                     @Override
@@ -63,6 +68,7 @@ public class MainFragment extends Fragment {
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        Log.d(TAG, "onResourceReady: ");
                         noBoLoadingManager.showLoadSuccess();
 
 
@@ -73,9 +79,8 @@ public class MainFragment extends Fragment {
     }
 
     public static String getRandomImage() {
-        int id = (int) (Math.random() * 100000);
-
-//        int id = -1;
+//        int id = (int) (Math.random() * 100000);
+        int id = -1;
         return String.format(Locale.CHINA, "https://www.thiswaifudoesnotexist.net/example-%d.jpg", id);
     }
 }
