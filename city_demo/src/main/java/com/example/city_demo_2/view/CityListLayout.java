@@ -76,7 +76,7 @@ public class CityListLayout extends LinearLayout {
 
     }
 
-    private LinkedHashMap<String, List<T>> hashMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, List> hashMap = new LinkedHashMap<>();
     //目标项是否在最后一个可见项之后
     private boolean mShouldScroll;
     //记录目标项位置
@@ -248,7 +248,7 @@ public class CityListLayout extends LinearLayout {
 
         LinkedHashMap<String, List<T>> convertList2Map(List<T> list);
         /** 过滤特殊字符  eg: "热门=0"**/
-        List<String>   filterSpecialLetter();
+        List<String>   filterSpecialLetter(LinkedHashMap<String, List> hashMap);
     }
 
 
@@ -258,7 +258,7 @@ public class CityListLayout extends LinearLayout {
      *
      * @param specialBeanListList
      */
-    public <T>void addCitySpecialData(String key, List<T> specialBeanListList) {
+    public void addCitySpecialData(String key, List specialBeanListList) {
 
         //0小于字母的值，所以会排序到前面
         hashMap.put(SPECIAL_TYPE, specialBeanListList);
@@ -276,46 +276,15 @@ public class CityListLayout extends LinearLayout {
 
         iCongfig.checkInputListAndSort(cityBeanListList);
 
-        iCongfig.convertList2Map(cityBeanListList);
+        hashMap = iCongfig.convertList2Map(cityBeanListList);
 
 
-//        List<T> subArray = null;
-//        String currLetter = "";
-//        for (int i = 0; i < cityBeanListList.size(); i++) {
-//
-//            CityBean cc = cityBeanListList.get(i);
-//            String pp = cc.getFirstWord();
-//            //上次字母和本次不一样，证明新数据
-//            if (!currLetter.equals(pp)) {
-//                currLetter = pp;
-//                subArray = new ArrayList<>();
-//                subArray.add(cc);
-//                hashMap.put(pp, subArray);
-//            } else {
-//                subArray.add(cc);
-//            }
-//        }
-//        List<String> subArray = new ArrayList<>();
-//        Iterator<Map.Entry<String, List<CityBean>>> iterator = hashMap.entrySet().iterator();
-//
-//        while (iterator.hasNext()) {
-//            String key = iterator.next().getKey();
-//            key = key.equals("0") ? "热门" : key;
-//            subArray.add(key);
-//        }
-
-        letterFirstWordList = iCongfig.filterSpecialLetter();
+        letterFirstWordList = iCongfig.filterSpecialLetter(hashMap);
 
         letterListView.setLetters(letterFirstWordList);
 
 
         setData2ViewLayout();
-    }
-
-    private void setData2LetterListview() {
-
-
-
     }
 
     /**
@@ -348,11 +317,12 @@ public class CityListLayout extends LinearLayout {
                     @Override
                     public void convert(FlowHolder holder, CityBean item, int position) {
 
+                        holder.setText(item.getcName());
                     }
 
                     @Override
                     public CityBean getItem(int pos) {
-                        return null;
+                        return cityBeans.get(pos);
                     }
                 });
             }
