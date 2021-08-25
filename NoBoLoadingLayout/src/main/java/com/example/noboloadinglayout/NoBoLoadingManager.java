@@ -15,83 +15,34 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import java.util.HashMap;
+
 public class NoBoLoadingManager {
 
 
     private static final String TAG = "NoBoLoadingManager";
-    private static volatile NoBoLoadingManager noBoLoadingManager;
     private Context context;
     private static ViewGroup wrapper;
 
     private LoadingView innerView;
     private SparseArray<View> statusView = new SparseArray<>(4);
 
-    private NoBoLoadingManager(Context context) {
-        this.context = context;
-    }
 
-
-    private static NoBoLoadingManager getInstance(Context context) {
-
-        if (noBoLoadingManager == null) {
-            synchronized (NoBoLoadingManager.class) {
-                noBoLoadingManager = new NoBoLoadingManager(context);
-            }
-        }
-        return noBoLoadingManager;
-    }
-
-
-    public static NoBoLoadingManager wrapActivity(FragmentActivity activity) {
-        Log.d(TAG, "wrapActivity: " + activity.hashCode());
-        getInstance(activity);
-
+    public NoBoLoadingManager(FragmentActivity activity) {
+        this.context = activity;
         wrapper = activity.findViewById(android.R.id.content);
-
-        return noBoLoadingManager;
+    }
+    public NoBoLoadingManager(View rootView) {
+        this.context = rootView.getContext();
+        wrapView(rootView);
     }
 
-    private static boolean isLoaded = false;
 
-    public static NoBoLoadingManager wrapFragment(Fragment fragment, View fragmentView) {
-        getInstance(fragment.getContext());
-
-        //如果已经加载过loading，不用再次加载
-        if (isLoaded) {
-            return noBoLoadingManager;
-        }
-        isLoaded = true;
-
-        wrapper = new FrameLayout(fragment.getContext());
-        ViewGroup.LayoutParams layoutParams = fragmentView.getLayoutParams();
-
-        if (layoutParams != null) {
-
-            FrameLayout.LayoutParams lay = new FrameLayout.LayoutParams(layoutParams.width,layoutParams.height);
-            wrapper.setLayoutParams(lay);
-        }
-
-        ViewGroup parent;
-        if ((parent = (ViewGroup) fragmentView.getParent()) != null) {
-            parent.removeView(fragmentView);
-        }
-        wrapper.addView(fragmentView);
-        return noBoLoadingManager;
-
-    }
-
-    public static NoBoLoadingManager wrapView( View rootView) {
-        if (rootView==null)
+    public void wrapView(View rootView) {
+        if (rootView == null)
             throw new NullPointerException("rootview is null");
-        getInstance(rootView.getContext());
 
-        //如果已经加载过loading，不用再次加载
-        if (isLoaded) {
-            return noBoLoadingManager;
-        }
-        isLoaded = true;
-
-        wrapper = new FrameLayout(rootView.getContext());
+        wrapper = new FrameLayout(context);
         ViewGroup.LayoutParams layoutParams = rootView.getLayoutParams();
 
         if (layoutParams != null) {
@@ -106,40 +57,10 @@ public class NoBoLoadingManager {
         }
         FrameLayout.LayoutParams newLp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         wrapper.addView(rootView, newLp);
-        return noBoLoadingManager;
+
 
     }
 
-    public static ViewGroup getWrapper() {
-
-        ViewGroup parent;
-        if ((parent = (ViewGroup) wrapper.getParent()) != null) {
-            parent.removeView(wrapper);
-        }
-        return wrapper;
-    }
-
-    private void initView() {
-        // 复用view
-        LoadingView currView = (LoadingView) statusView.get(LoadingView.STATUS_LOADING);
-        if (currView == null) {
-            currView = (LoadingView) statusView.get(LoadingView.STATUS_LOAD_FAILED);
-        }
-        if (currView == null) {
-            innerView = new NormalLoadingView(context);
-            statusView.put(LoadingView.STATUS_LOADING, innerView);
-//            preStatus = LoadingView.STATUS_LOADING;
-            wrapper.addView(innerView);
-        } else {
-            ViewGroup parent;
-            if ((parent = (ViewGroup) currView.getParent()) != null) {
-                parent.removeView(currView);
-            }
-            innerView = currView;
-            wrapper.addView(innerView);
-            innerView.bringToFront();
-        }
-    }
 
     public void showLoading() {
         showLoading(null);
@@ -151,32 +72,53 @@ public class NoBoLoadingManager {
      */
     public void showLoading(LoadingView inputView) {
 
-        if (inputView == null) {
 
-            initView();
-        } else {
-            innerView = inputView;
-        }
+            // 复用view
+            innerView = (LoadingView) statusView.get(LoadingView.STATUS_LOADING);
 
-        checkNotNull();
+            innerView= innerView == null ? (LoadingView) statusView.get(LoadingView.STATUS_LOAD_FAILED) : innerView;
 
+            //缓存里没有，取外部
+            if (innerView==null){
+
+                if (inputView!=null){
+
+                    innerView = inputView;
+
+                    ViewGroup parent;
+                    if ((parent = (ViewGroup) innerView.getParent()) != null) {
+                        parent.removeView(innerView);
+                    }
+                    statusView.put(LoadingView.STATUS_LOADING, innerView);
+
+                    wrapper.addView(innerView);
+                }else{
+                    innerView = new NormalLoadingView(context);
+                    statusView.put(LoadingView.STATUS_LOADING, innerView);
+
+                    wrapper.addView(innerView);
+
+                }
+
+            } else{
+
+                ViewGroup parent;
+                if ((parent = (ViewGroup) innerView.getParent()) != null) {
+                    parent.removeView(innerView);
+                }
+
+                wrapper.addView(innerView);
+            }
 
         innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOADING);
     }
 
-    public NoBoLoadingManager showLoadFailed() {
+    public void showLoadFailed() {
 
         showLoadFailed(null);
-        return this;
-    }
-
-    public void showRetry(LoadingView.IRetryClickListener iRetryClickListener) {
-        checkNotNull();
-        statusView.put(LoadingView.STATUS_LOAD_FAILED, innerView);
-//        preStatus = LoadingView.STATUS_LOAD_FAILED;
-        innerView.setIRetryClickListener(iRetryClickListener);
 
     }
+
 
     public void showLoadFailed(LoadingView.IRetryClickListener iRetryClickListener) {
         checkNotNull();
@@ -193,20 +135,23 @@ public class NoBoLoadingManager {
     public void showLoadSuccess(String msg) {
         checkNotNull();
         statusView.put(LoadingView.STATUS_LOAD_SUCCESS, innerView);
-//        preStatus = LoadingView.STATUS_LOAD_SUCCESS;
         innerView.setVisibleByStatus(NormalLoadingView.STATUS_LOAD_SUCCESS);
-        reset();
     }
 
-    private void reset() {
-        statusView.clear();
-        isLoaded = false;
-        innerView = null;
-    }
 
     private void checkNotNull() {
         if (innerView == null)
             throw new NullPointerException("innerview must be not null");
+    }
+
+    /**
+     * 回收资源
+     */
+    public void clear(){
+        if (this.context!=null)
+            this.context =null;
+
+        statusView.clear();
     }
 
 }
