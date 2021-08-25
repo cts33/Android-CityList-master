@@ -1,13 +1,11 @@
 package com.example.noboloadinglayout;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class NormalLoadingView extends  LoadingView{
@@ -31,7 +29,7 @@ public class NormalLoadingView extends  LoadingView{
         inflater = LayoutInflater.from(context);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER_HORIZONTAL);
-        LayoutInflater.from(context).inflate(R.layout.view_global_loading_status, this, true);
+        LayoutInflater.from(context).inflate(R.layout.view_loading, this, true);
         mImage = findViewById(R.id.image);
         mDes = findViewById(R.id.text);
         setBackgroundColor(getResources().getColor(R.color.main_bg_1));
