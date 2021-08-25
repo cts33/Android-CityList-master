@@ -14,7 +14,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.city_demo_2.R;
+import com.example.noboloadinglayout.LoadingView;
 import com.example.noboloadinglayout.NoBoLoadingManager;
+import com.example.noboloadinglayout.NormalLoadingView;
 
 import java.util.Locale;
 
@@ -30,7 +32,8 @@ public class LoadingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
 
-        noBoLoadingManager = NoBoLoadingManager.wrapActivity(this);
+        noBoLoadingManager = new NoBoLoadingManager(this);
+
 
         initViews();
 
@@ -42,7 +45,8 @@ public class LoadingActivity extends AppCompatActivity {
     private void initViews() {
         mImage = findViewById(R.id.image);
 
-        noBoLoadingManager.showLoading();
+        NormalLoadingView innerView = new NormalLoadingView(this);
+        noBoLoadingManager.showLoading(innerView);
 
         Glide.with(this)
                 .load(getRandomImage())
@@ -50,7 +54,12 @@ public class LoadingActivity extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
-                        noBoLoadingManager.showLoadFailed();
+                        noBoLoadingManager.showLoadFailed(new LoadingView.IRetryClickListener() {
+                            @Override
+                            public void retryClick() {
+                                initViews();
+                            }
+                        });
 
                         Log.d(TAG, "onLoadFailed: ");
 

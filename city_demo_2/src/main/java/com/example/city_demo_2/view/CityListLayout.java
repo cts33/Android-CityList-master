@@ -185,8 +185,10 @@ public class CityListLayout extends LinearLayout {
     public void addCurrLocation(CityBean currCityBean, @LayoutRes int layoutid) {
 
         if (mAdapter == null) {
+            //处理普通数据的适配器
             mAdapter = new BaseCityAdapter(getContext());
         }
+        //处理头部数据的适配器，eg: 当前位置
         mHeaderAdapter = new Header_FooterWrapperAdapter(mAdapter) {
             @Override
             protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean cityBean) {

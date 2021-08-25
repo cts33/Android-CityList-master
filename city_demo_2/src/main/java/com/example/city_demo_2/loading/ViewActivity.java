@@ -14,6 +14,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.city_demo_2.R;
+import com.example.noboloadinglayout.LoadingView;
 import com.example.noboloadinglayout.NoBoLoadingManager;
 
 import static com.example.city_demo_2.loading.Utils.getRandomImage;
@@ -25,6 +26,7 @@ public class ViewActivity extends AppCompatActivity {
 
 
     ImageView image;
+    private NoBoLoadingManager noBoLoadingManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,9 @@ public class ViewActivity extends AppCompatActivity {
         setContentView(R.layout.view_activity);
 
 
+
         image = findViewById(R.id.image);
+        noBoLoadingManager = new NoBoLoadingManager(image);
 
 
         initView();
@@ -42,14 +46,19 @@ public class ViewActivity extends AppCompatActivity {
     private void initView() {
 
 
-        NoBoLoadingManager.wrapView(image).showLoading();
+        noBoLoadingManager .showLoading();
         Glide.with(this)
                 .load( getRandomImage())
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
-                        NoBoLoadingManager.wrapView(image).showLoadFailed();
+                        noBoLoadingManager .showLoadFailed(new LoadingView.IRetryClickListener() {
+                            @Override
+                            public void retryClick() {
+                                initView();
+                            }
+                        });
 
                         Log.d(TAG, "onLoadFailed: ");
 
@@ -60,7 +69,7 @@ public class ViewActivity extends AppCompatActivity {
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         Log.d(TAG, "onResourceReady: ");
 
-                        NoBoLoadingManager.wrapView(image).showLoadSuccess();
+                        noBoLoadingManager .showLoadSuccess();
 
                         return false;
                     }

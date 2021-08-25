@@ -36,11 +36,15 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, null);
 
-        noBoLoadingManager = NoBoLoadingManager.wrapFragment(this, root);
+        Log.d(TAG, "onCreateView: " + root.getId());
+
+        noBoLoadingManager = new NoBoLoadingManager(root);
 
         mImage = root.findViewById(R.id.image);
+
         initViews();
-        return NoBoLoadingManager.getWrapper();
+
+        return (View) root.getParent();
     }
 
     private static final String TAG = "MainFragment";
@@ -57,7 +61,12 @@ public class MainFragment extends Fragment {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
 
-                        noBoLoadingManager.showLoadFailed();
+                        noBoLoadingManager.showLoadFailed(new LoadingView.IRetryClickListener() {
+                            @Override
+                            public void retryClick() {
+                                initViews();
+                            }
+                        });
 
                         Log.d(TAG, "onLoadFailed: ");
 
