@@ -36,7 +36,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation files('libs\\pinyin4android1.0.jar')
     implementation files('libs\\pinyin4j-2.5.0.jar')
-    implementation project(path: ':NoBoLoadingLayout')
+    implementation project(path: ':LoadingLayout')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

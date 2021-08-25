@@ -1,5 +1,5 @@
 //include ':app'
 //include ':city_demo'
 
-include ':city_demo_2'
-include ':NoBoLoadingLayout'
+include ':city_demo'
+include ':LoadingLayout'
