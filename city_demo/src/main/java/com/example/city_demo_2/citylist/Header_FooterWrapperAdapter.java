@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.city_demo_2.citylist.bean.CityBean;
 
-public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class Header_FooterWrapperAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int HEADER_TYPE = 11;
 
     protected RecyclerView.Adapter mInnerAdapter;//内部的的普通Adapter
     private int layoutId;
 
-    private CityBean data;
+    private T data;
 
     public Header_FooterWrapperAdapter(RecyclerView.Adapter mInnerAdapter) {
         this.mInnerAdapter = mInnerAdapter;
@@ -40,7 +40,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
      * @param layoutId headerView 的LayoutId
      * @param data     headerView 的data
      */
-    public void addHeaderView(int layoutId, CityBean data) {
+    public void addHeaderView(int layoutId, T data) {
         this.layoutId = layoutId;
         this.data = data;
     }
@@ -64,7 +64,7 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
         }
     }
 
-    protected abstract void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o);
+    protected abstract void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, T o);
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -91,11 +91,18 @@ public abstract class Header_FooterWrapperAdapter extends RecyclerView.Adapter<R
     public String getFirstWordByPosition(int firstVisibleItemPosition) {
         String result = "";
         if (firstVisibleItemPosition == 0) {
-            result = data.getFirstWord();
+            result = getFWBean(data);
         }
         if (mInnerAdapter != null) {
            result = ((BaseCityAdapter) mInnerAdapter).getFirstWordByPos(firstVisibleItemPosition - getHeaderViewCount());
         }
         return result;
     }
+
+    /**
+     * 通过对象获取首字母
+     * @param bean
+     * @return
+     */
+    protected abstract String getFWBean(T bean);
 }

@@ -41,7 +41,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         mCitylistlayout = findViewById(R.id.cityListLayout);
 
-        mCitylistlayout.addCurrLocation(cityBean, R.layout.item_city);
+        mCitylistlayout.addCurrLocation(cityBean);
         mCitylistlayout.addCitySpecialData("热门", sss);
         mCitylistlayout.addCityList(allList);
         mCitylistlayout.setItemClickListener(new CityListLayout.ItemClickListener() {

@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +13,7 @@ import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,7 +27,8 @@ import java.util.Map;
 public class SuspensionDecoration extends RecyclerView.ItemDecoration {
 //    private List<? extends ISuspensionInterface> mDatas;
 
-    private HashMap<String, List<CityBean>> hashMap = new LinkedHashMap<>();
+    //    private HashMap<String, List<CityBean>> hashMap = new LinkedHashMap<>();
+    private List<String> letterList = new ArrayList<>();
     private Paint mPaint;
     private Rect mBounds;//用于存放测量文字Rect
 
@@ -42,9 +43,9 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
     private int mHeaderViewCount = 0;
 
 
-    public SuspensionDecoration(Context context, HashMap<String, List<CityBean>> hashMap) {
+    public SuspensionDecoration(Context context, List<String> letterList) {
         super();
-        this.hashMap = hashMap;
+        this.letterList = letterList;
         mPaint = new Paint();
         mBounds = new Rect();
         mTitleHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, context.getResources().getDisplayMetrics());
@@ -76,10 +77,10 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         return this;
     }
 
-    public SuspensionDecoration setmDatas(HashMap<String, List<CityBean>> hashMap) {
-        this.hashMap = hashMap;
-        return this;
-    }
+//    public SuspensionDecoration setmDatas( List<String> letterList) {
+//        this.letterList = letterList;
+//        return this;
+//    }
 
     public int getHeaderViewCount() {
         return mHeaderViewCount;
@@ -98,14 +99,14 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child .getLayoutParams();
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
             int position = params.getViewLayoutPosition();
             position -= getHeaderViewCount();
             //pos为1，size为1，1>0? true
-            if (hashMap == null || hashMap.isEmpty() || position > hashMap.size() - 1 || position < 0 /**|| !hashMap.get(position).isShowSuspension()**/) {
+            if (letterList == null || letterList.isEmpty() || position > letterList.size() - 1 || position < 0 /**|| !hashMap.get(position).isShowSuspension()**/) {
                 continue;//越界
             }
-            if (position >=0) {
+            if (position >= 0) {
                 if (position == 0) {
                     drawTitleArea(c, left, right, child, params, position);
 
@@ -145,20 +146,22 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
      * @return
      */
     public String getSuspensionFirstWord(int pos) {
-        int index = 0;
 
-        Iterator<Map.Entry<String, List<CityBean>>> iterator = hashMap.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry<String, List<CityBean>> next = iterator.next();
-            if (index == pos) {
-                String key = next.getKey();
-                key = key.equals("0") ?"热门":key;
-                return key != null ? key : "";
-            }
-            index++;
-        }
-        return "";
+        return letterList.get(pos);
+//        int index = 0;
+//
+//        Iterator<Map.Entry<String, List<CityBean>>> iterator = letterList.entrySet().iterator();
+//
+//        while (iterator.hasNext()) {
+//            Map.Entry<String, List<CityBean>> next = iterator.next();
+//            if (index == pos) {
+//                String key = next.getKey();
+//                key = key.equals("0") ? "热门" : key;
+//                return key != null ? key : "";
+//            }
+//            index++;
+//        }
+//        return "";
     }
 
     @Override
@@ -167,7 +170,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         int pos = ((LinearLayoutManager) (parent.getLayoutManager())).findFirstVisibleItemPosition();
         pos -= getHeaderViewCount();
 
-        if (hashMap == null || hashMap.isEmpty() || pos > hashMap.size() - 1 || pos < 0) {
+        if (letterList == null || letterList.isEmpty() || pos > letterList.size() - 1 || pos < 0) {
             return;//越界
         }
 
@@ -206,7 +209,7 @@ public class SuspensionDecoration extends RecyclerView.ItemDecoration {
         int position = ((RecyclerView.LayoutParams) view.getLayoutParams()).getViewLayoutPosition();
         position -= getHeaderViewCount();
 
-        if (hashMap == null || hashMap.isEmpty() || position > hashMap.size() - 1) {//pos为1，size为1，1>0? true
+        if (letterList == null || letterList.isEmpty() || position > letterList.size() - 1) {//pos为1，size为1，1>0? true
             return;//越界
         }
 
