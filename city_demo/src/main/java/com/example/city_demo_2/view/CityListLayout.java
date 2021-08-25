@@ -276,7 +276,10 @@ public class CityListLayout extends LinearLayout {
 
         iCongfig.checkInputListAndSort(cityBeanListList);
 
-        hashMap = iCongfig.convertList2Map(cityBeanListList);
+
+        LinkedHashMap linkedHashMap = iCongfig.convertList2Map(cityBeanListList);
+
+        hashMap.putAll(linkedHashMap);
 
 
         letterFirstWordList = iCongfig.filterSpecialLetter(hashMap);
