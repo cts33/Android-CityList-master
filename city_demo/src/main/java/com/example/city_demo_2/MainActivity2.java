@@ -2,12 +2,16 @@ package com.example.city_demo_2;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.city_demo_2.citylist.ViewHolder;
 import com.example.city_demo_2.citylist.bean.CityBean;
 import com.example.city_demo_2.db.DBDao;
+import com.example.city_demo_2.flow.CommonFlowAdapter;
+import com.example.city_demo_2.flow.FlowingLayout;
 import com.example.city_demo_2.view.CityListLayout;
 
 import java.util.ArrayList;
@@ -17,6 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.example.city_demo_2.view.CityListLayout.SPECIAL_TYPE;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -47,31 +53,14 @@ public class MainActivity2 extends AppCompatActivity {
 
         mCitylistlayout = findViewById(R.id.cityListLayout);
 
-        mCitylistlayout.setICongfig(iCongfig);
-
         mCitylistlayout.addCurrLocation(cityBean);
         mCitylistlayout.addCitySpecialData("热门", sss);
-        mCitylistlayout.addCityList(allList);
+        mCitylistlayout.addCityList(allList,cityAdapter);
 
-//        mCitylistlayout.setItemClickListener(new CityListLayout.ItemClickListener() {
-//            @Override
-//            public void headerViewClick(CityBean cityBean) {
-//                Toast.makeText(MainActivity2.this, "" + cityBean.toString(), Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void flowItemClick(CityBean cityBean) {
-//
-//                Toast.makeText(MainActivity2.this, "" + cityBean.toString(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
     }
 
-    CityListLayout.ICongfig iCongfig =new CityListLayout.ICongfig<CityBean>() {
-        @Override
-        public CityBean getBeanByPos(int pos) {
-            return null;
-        }
+    CityListLayout.CityAdapter cityAdapter =new CityListLayout.CityAdapter<CityBean>() {
 
         @Override
         public void checkInputListAndSort(List<CityBean> cityBeanListList) {
@@ -96,13 +85,8 @@ public class MainActivity2 extends AppCompatActivity {
                         cityBean.setFirstWord(shou);
                     }
                 }
-
-
             }
-
             Collections.sort(cityBeanListList);
-
-
 
         }
 
@@ -131,19 +115,44 @@ public class MainActivity2 extends AppCompatActivity {
             return hashMap;
         }
 
+
         @Override
-        public List<String> filterSpecialLetter(LinkedHashMap<String, List> hashMap) {
+        public int getGroupItemLayout() {
+            return R.layout.recycler_item;
+        }
 
+        @Override
+        public void bindGroupData2ItemView(ViewHolder holder, List<CityBean> cityBeans) {
+                FlowingLayout view = holder.getView(R.id.flowingLayout);
 
-            List<String> subArray = new ArrayList<>();
-            Iterator<Map.Entry<String, List>> iterator = hashMap.entrySet().iterator();
+                view.setAdapter(new CommonFlowAdapter<CityBean>(holder.getContext(), cityBeans) {
+                    @Override
+                    public void convert(FlowHolder holder, CityBean item, int position) {
 
-            while (iterator.hasNext()) {
-                String key = iterator.next().getKey();
-                key = key.equals("0") ? "热门" : key;
-                subArray.add(key);
-            }
-            return subArray;
+                        holder.setText(item.getcName());
+                    }
+
+                    @Override
+                    public CityBean getItem(int pos) {
+                        return cityBeans.get(pos);
+                    }
+                });
+        }
+
+        @Override
+        public void bindHeaderViewData(ViewHolder holder, CityBean cityBean) {
+            holder.setText(R.id.location,cityBean.getcName());
+            holder.getView(R.id.location).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        }
+
+        @Override
+        public String getHeaderViewFirstWord(CityBean bean) {
+            return bean.getFirstWord();
         }
     };
 }

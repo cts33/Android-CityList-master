@@ -215,6 +215,7 @@ public class LetterListView extends View {
 
 
     public void updateSelectIndex(String word) {
+
         visibleOverLay(word);
 
         //如果是滑动事件，不处理
@@ -357,12 +358,13 @@ public class LetterListView extends View {
     public void visibleOverLay(String firstword){
         if (isOverlayReady) {
 
-            Pattern pattern = Pattern.compile("[A-Z]");
+            Pattern pattern = Pattern.compile("[A-Z0-9]");
             if (pattern.matcher(firstword).matches()) {
                 letterOverlay.setTextSize(40);
             } else {
                 letterOverlay.setTextSize(20);
             }
+            firstword = firstword.equals("0") ? "热门":firstword;
             letterOverlay.setText(firstword);
             letterOverlay.setVisibility(View.VISIBLE);
             handler.removeCallbacks(overlayThread);

@@ -40,7 +40,7 @@ public abstract class Header_FooterWrapperAdapter<T> extends RecyclerView.Adapte
      * @param layoutId headerView 的LayoutId
      * @param data     headerView 的data
      */
-    public void addHeaderView(int layoutId, T data) {
+    public void addHeaderViewData(int layoutId, T data) {
         this.layoutId = layoutId;
         this.data = data;
     }

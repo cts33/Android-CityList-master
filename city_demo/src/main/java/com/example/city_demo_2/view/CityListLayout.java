@@ -2,6 +2,7 @@ package com.example.city_demo_2.view;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,8 +26,12 @@ import com.example.city_demo_2.citylist.bean.SuspensionDecoration;
 import com.example.city_demo_2.flow.CommonFlowAdapter;
 import com.example.city_demo_2.flow.FlowingLayout;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CityListLayout extends LinearLayout {
 
@@ -124,6 +129,8 @@ public class CityListLayout extends LinearLayout {
                 } else {
                     word = mAdapter.getFirstWordByPos(firstVisibleItemPosition);
                 }
+                if (TextUtils.isEmpty(word))
+                    return;
 
                 //TODO 处理多次任务为一次任务
                 letterListView.updateSelectIndex(word);
@@ -146,35 +153,8 @@ public class CityListLayout extends LinearLayout {
 
             }
         });
-
-
     }
 
-//    private void checkInputListOk(List<T> cityBeanListList) {
-//        if (cityBeanListList == null)
-//            throw new NullPointerException("传入数据不能为 null");
-//
-//        for (int i = 0; i < cityBeanListList.size(); i++) {
-//            CityBean cityBean = iCongfig.getBeanByPos(i);
-//            if (TextUtils.isEmpty(cityBean.getcName())) {
-//                throw new NullPointerException("name 数据不能为 null");
-//            }
-//            //name  转化为拼音
-//            if (TextUtils.isEmpty(cityBean.getPinyin())) {
-//
-//                String pinyin = PingYinUtil.getPingYin(cityBean.getcName());
-//                cityBean.setPinyin(pinyin);
-//
-//                if (!TextUtils.isEmpty(pinyin)) {
-//                    String shou = cityBean.getPinyin().substring(0, 1).toUpperCase();
-//
-//                    cityBean.setFirstWord(shou);
-//                }
-//            }
-//
-//
-//        }
-//    }
 
     public static final String SPECIAL_TYPE = "0";
 
@@ -185,70 +165,78 @@ public class CityListLayout extends LinearLayout {
             mAdapter = new BaseCityAdapter(getContext());
         }
         //处理头部数据的适配器，eg: 当前位置
-        mHeaderAdapter = new Header_FooterWrapperAdapter<CityBean>(mAdapter) {
+        mHeaderAdapter = new Header_FooterWrapperAdapter<T>(mAdapter) {
             @Override
-            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean o) {
-                holder.getView(R.id.location).setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (itemClickListener != null) {
-                            itemClickListener.headerViewClick(o);
-                        }
-                    }
-                });
+            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, T t) {
+
+                if (cityAdapter != null) {
+                    cityAdapter.bindHeaderViewData(holder, t);
+                }
+
             }
 
             @Override
-            protected String getFWBean(CityBean bean) {
-                return bean.getFirstWord();
+            protected String getFWBean(T bean) {
+                if (cityAdapter != null) {
+                    return cityAdapter.getHeaderViewFirstWord(bean);
+                }
+                return "";
             }
 
-//            @Override
-//            protected void onBindHeaderHolder(ViewHolder holder, int headerPos, int layoutId, CityBean cityBean) {
-//
-//                holder.getView(R.id.location).setOnClickListener(new OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if (itemClickListener != null) {
-//                            itemClickListener.headerViewClick(cityBean);
-//                        }
-//                    }
-//                });
-//            }
         };
 
-        mHeaderAdapter.addHeaderView(R.layout.item_current_location, currCityBean);
+        mHeaderAdapter.addHeaderViewData(R.layout.item_current_location, currCityBean);
 
 
     }
 
-    private ItemClickListener itemClickListener;
 
-    public void setItemClickListener(ItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
-    }
 
-    public interface ItemClickListener<T> {
-        void headerViewClick(T cityBean);
+    private CityAdapter cityAdapter;
 
-        void flowItemClick(T cityBean);
-    }
 
-    private ICongfig iCongfig;
+    public interface CityAdapter<T> {
 
-    public void setICongfig(ICongfig iCongfig) {
-        this.iCongfig = iCongfig;
-    }
-
-    public interface ICongfig<T> {
-
-        T getBeanByPos(int pos);
-
+        /**
+         * 检查内部元素是否有首字母这个字段firstword，如果没有，把城市名称
+         * 转成拼音，再转成首字母大写,最后记得按照字母排序
+         **/
         void checkInputListAndSort(List<T> list);
 
+        /**
+         * 把原来list集合数据，根据首字母分类成各个字母的集合
+         **/
         LinkedHashMap<String, List<T>> convertList2Map(List<T> list);
-        /** 过滤特殊字符  eg: "热门=0"**/
-        List<String>   filterSpecialLetter(LinkedHashMap<String, List> hashMap);
+
+
+        /**
+         * 获取每个字母组 对应的layout
+         *
+         * @return
+         */
+        int getGroupItemLayout();
+
+        /**
+         * 绑定字母组的数据 给每个组view,eg:A对应的集合数据给view,如何显示，自己定义
+         *
+         * @param holder
+         * @param cityBeans
+         */
+        void bindGroupData2ItemView(ViewHolder holder, List<T> cityBeans);
+
+        /**
+         * 给头布局绑定 数据
+         * @param holder
+         * @param t
+         */
+        void bindHeaderViewData(ViewHolder holder, T t);
+
+        /**
+         * 获取头部布局对应的首字母
+         * @param bean
+         * @return
+         */
+        String getHeaderViewFirstWord(T bean);
     }
 
 
@@ -259,9 +247,10 @@ public class CityListLayout extends LinearLayout {
      * @param specialBeanListList
      */
     public void addCitySpecialData(String key, List specialBeanListList) {
-
-        //0小于字母的值，所以会排序到前面
-        hashMap.put(SPECIAL_TYPE, specialBeanListList);
+        if (!TextUtils.isEmpty(key) && key.equals("热门")) {
+            //0小于字母的值，所以会排序到前面
+            hashMap.put(SPECIAL_TYPE, specialBeanListList);
+        }
     }
 
     /**
@@ -272,20 +261,25 @@ public class CityListLayout extends LinearLayout {
      *
      * @param cityBeanListList
      */
-    public <T>void addCityList(List<T> cityBeanListList) {
+    public <T> void addCityList(List<T> cityBeanListList, CityAdapter cityAdapter) {
+        this.cityAdapter = cityAdapter;
+        this.cityAdapter.checkInputListAndSort(cityBeanListList);
 
-        iCongfig.checkInputListAndSort(cityBeanListList);
 
-
-        LinkedHashMap linkedHashMap = iCongfig.convertList2Map(cityBeanListList);
+        LinkedHashMap linkedHashMap = this.cityAdapter.convertList2Map(cityBeanListList);
 
         hashMap.putAll(linkedHashMap);
 
+        letterFirstWordList = new ArrayList<>();
+        Iterator<Map.Entry<String, List>> iterator = hashMap.entrySet().iterator();
 
-        letterFirstWordList = iCongfig.filterSpecialLetter(hashMap);
+        while (iterator.hasNext()) {
+            String key = iterator.next().getKey();
+            key = key.equals(SPECIAL_TYPE) ? "热门" : key;
+            letterFirstWordList.add(key);
+        }
 
         letterListView.setLetters(letterFirstWordList);
-
 
         setData2ViewLayout();
     }
@@ -314,25 +308,17 @@ public class CityListLayout extends LinearLayout {
         mAdapter.setIBindItemSubList(new BaseCityAdapter.IBindItemSubList<CityBean>() {
             @Override
             public void bindData2View(ViewHolder holder, List<CityBean> cityBeans) {
-                FlowingLayout view = holder.getView(R.id.flowingLayout);
-
-                view.setAdapter(new CommonFlowAdapter<CityBean>(getContext(),cityBeans) {
-                    @Override
-                    public void convert(FlowHolder holder, CityBean item, int position) {
-
-                        holder.setText(item.getcName());
-                    }
-
-                    @Override
-                    public CityBean getItem(int pos) {
-                        return cityBeans.get(pos);
-                    }
-                });
+                if (cityAdapter != null) {
+                    cityAdapter.bindGroupData2ItemView(holder, cityBeans);
+                }
             }
 
             @Override
             public int getVHLayout() {
-                return R.layout.recycler_item;
+                if (cityAdapter != null) {
+                    return cityAdapter.getGroupItemLayout();
+                }
+                return 0;
             }
         });
 
