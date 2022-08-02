@@ -2,6 +2,7 @@ package com.example.city_demo_2;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ import static com.example.city_demo_2.view.CityListLayout.SPECIAL_TYPE;
 public class MainActivity2 extends AppCompatActivity {
 
     private CityListLayout mCitylistlayout;
-
+    private static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +43,10 @@ public class MainActivity2 extends AppCompatActivity {
 
         List<CityBean> allList = dbDao.getAllList();
 
+        if (allList.isEmpty()){
+            Log.d(TAG, "initViews: 请把数据库文件cities.db复制数据库目录里");
+            return;
+        }
 
         List<CityBean> sss = new ArrayList<>();
         sss.addAll(allList.subList(10, 20));
